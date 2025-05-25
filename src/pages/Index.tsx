@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import StatsOverview from '@/components/dashboard/StatsOverview';
 import ChainStatusCard from '@/components/dashboard/ChainStatusCard';
@@ -13,7 +13,7 @@ import { apiService } from '@/lib/api';
 import { Activity, TrendingUp, AlertCircle } from 'lucide-react';
 
 const Index = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { 
     chainStatus, 
     setChainStatus, 
@@ -62,7 +62,7 @@ const Index = () => {
     }
 
     // Navigate to appropriate page with pre-selected chain
-    router.push(`/${action}?chain=${chainId}`);
+    navigate(`/${action}?chain=${chainId}`);
   };
 
   const recentActivity = [
@@ -130,7 +130,7 @@ const Index = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push('/chains')}
+                onClick={() => navigate('/chains')}
                 className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
               >
                 View All Chains
@@ -200,7 +200,7 @@ const Index = () => {
               <CardContent className="space-y-3">
                 <Button
                   className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
-                  onClick={() => router.push('/deploy')}
+                  onClick={() => navigate('/deploy')}
                   disabled={!wallet.isConnected}
                 >
                   Deploy Contracts
@@ -209,7 +209,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
-                  onClick={() => router.push('/swap')}
+                  onClick={() => navigate('/swap')}
                   disabled={!wallet.isConnected}
                 >
                   Token Swap
@@ -218,7 +218,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
-                  onClick={() => router.push('/gm')}
+                  onClick={() => navigate('/gm')}
                   disabled={!wallet.isConnected}
                 >
                   Daily GM Ritual

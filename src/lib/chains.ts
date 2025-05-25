@@ -10,7 +10,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     faucetUrl: "https://faucet.testnet.nexus.xyz",
     nativeCurrency: {
       name: "Nexus",
-      symbol: "NXS",
+      symbol: "NEX",
       decimals: 18,
     },
     testnet: true,
@@ -22,7 +22,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     blockExplorer: "https://explorer-testnet.0g.ai",
     faucetUrl: "https://faucet.0g.ai",
     nativeCurrency: {
-      name: "0G",
+      name: "0G Token",
       symbol: "0G",
       decimals: 18,
     },
@@ -105,7 +105,11 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     testnet: true,
-  }
+  },
+};
+
+export const getAllChains = (): ChainConfig[] => {
+  return Object.values(SUPPORTED_CHAINS);
 };
 
 export const getChainById = (chainId: number): ChainConfig | undefined => {
@@ -114,8 +118,4 @@ export const getChainById = (chainId: number): ChainConfig | undefined => {
 
 export const getChainByKey = (key: string): ChainConfig | undefined => {
   return SUPPORTED_CHAINS[key];
-};
-
-export const getAllChains = (): ChainConfig[] => {
-  return Object.values(SUPPORTED_CHAINS);
 };

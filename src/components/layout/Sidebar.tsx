@@ -1,6 +1,5 @@
 
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -20,7 +19,7 @@ import { useAppStore } from '@/stores/useAppStore';
 import { SUPPORTED_CHAINS } from '@/lib/chains';
 
 const Sidebar = ({ className }: { className?: string }) => {
-  const router = useRouter();
+  const location = useLocation();
   const { chainStatus, deployments, swaps, gmPosts } = useAppStore();
 
   const navigation = [
@@ -74,7 +73,7 @@ const Sidebar = ({ className }: { className?: string }) => {
     },
   ];
 
-  const activeChains = Object.values(chainStatus).filter(status => status.isActive).length;
+  const activeChains = Object.values(chainStatus).filter(status => status?.isActive).length;
 
   return (
     <div className={cn("flex h-full w-64 flex-col bg-gray-950/50 border-r border-purple-900/20", className)}>
@@ -92,9 +91,9 @@ const Sidebar = ({ className }: { className?: string }) => {
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-2">
           {navigation.map((item) => {
-            const isActive = router.pathname === item.href;
+            const isActive = location.pathname === item.href;
             return (
-              <Link key={item.name} href={item.href}>
+              <Link key={item.name} to={item.href}>
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   className={cn(
@@ -138,7 +137,7 @@ const Sidebar = ({ className }: { className?: string }) => {
                 </div>
               );
             })}
-            <Link href="/chains">
+            <Link to="/chains">
               <Button variant="ghost" size="sm" className="w-full mt-2 text-purple-400 hover:text-purple-300">
                 <Zap className="mr-2 h-3 w-3" />
                 View All Chains

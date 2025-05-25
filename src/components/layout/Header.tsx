@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -27,7 +27,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
               <span className="text-white font-bold text-lg">S</span>
             </div>
@@ -41,7 +41,7 @@ const Header = () => {
             {navigation.map((item) => (
               <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
               >
                 {item.name}
@@ -102,7 +102,7 @@ const Header = () => {
               {navigation.map((item) => (
                 <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

@@ -1,9 +1,10 @@
 
-import { APIResponse, ChainStatus, DeploymentStatus, SwapTransaction, GMPost, AnalyticsOverview, ChainMetrics, QualificationData } from '@/types';
+import { APIResponse, ChainStatus, AnalyticsOverview, ChainMetrics, QualificationData } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// API base configuration
+const API_BASE_URL = process.env.VITE_API_BASE_URL || '/api';
 
-class ApiService {
+class APIService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<APIResponse<T>> {
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -19,9 +20,12 @@ class ApiService {
       }
 
       const data = await response.json();
-      return data;
+      return {
+        success: true,
+        data,
+      };
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error(`API request failed for ${endpoint}:`, error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -29,136 +33,117 @@ class ApiService {
     }
   }
 
-  // Chain Management
+  // Chain Management APIs
   async getChainStatus(): Promise<APIResponse<Record<string, ChainStatus>>> {
-    return this.request('/api/chains/status');
+    return this.request('/chains/status');
   }
 
   async getChainInfo(chainId: number): Promise<APIResponse<any>> {
-    return this.request(`/api/chains/${chainId}`);
+    return this.request(`/chains/${chainId}`);
   }
 
-  async getGasPrices(chainId: number): Promise<APIResponse<string>> {
-    return this.request(`/api/chains/${chainId}/gas`);
+  async getGasPrices(chainId: number): Promise<APIResponse<any>> {
+    return this.request(`/chains/${chainId}/gas`);
   }
 
-  // Contract Operations
-  async deployContract(data: {
-    chainIds: number[];
-    template: string;
-    parameters: Record<string, any>;
-  }): Promise<APIResponse<DeploymentStatus[]>> {
-    return this.request('/api/contracts/deploy', {
+  // Contract Operations APIs
+  async deployContract(data: any): Promise<APIResponse<any>> {
+    return this.request('/contracts/deploy', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async getContractTemplates(): Promise<APIResponse<any[]>> {
-    return this.request('/api/contracts/templates');
+  async getContractTemplates(): Promise<APIResponse<any>> {
+    return this.request('/contracts/templates');
   }
 
-  async getDeploymentStatus(id: string): Promise<APIResponse<DeploymentStatus>> {
-    return this.request(`/api/contracts/deployment/${id}`);
+  async getDeploymentStatus(id: string): Promise<APIResponse<any>> {
+    return this.request(`/contracts/deployment/${id}`);
   }
 
-  async verifyContract(data: {
-    chainId: number;
-    contractAddress: string;
-    sourceCode: string;
-  }): Promise<APIResponse<any>> {
-    return this.request('/api/contracts/verify', {
+  async verifyContract(data: any): Promise<APIResponse<any>> {
+    return this.request('/contracts/verify', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  // Swap Operations
-  async getSwapQuote(data: {
-    chainId: number;
-    fromToken: string;
-    toToken: string;
-    amount: string;
-  }): Promise<APIResponse<any>> {
-    return this.request('/api/swap/quote', {
+  // Swap Operations APIs
+  async getSwapQuote(data: any): Promise<APIResponse<any>> {
+    return this.request('/swap/quote', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async executeSwap(data: {
-    chainId: number;
-    fromToken: string;
-    toToken: string;
-    amount: string;
-    slippage: number;
-  }): Promise<APIResponse<SwapTransaction>> {
-    return this.request('/api/swap/execute', {
+  async executeSwap(data: any): Promise<APIResponse<any>> {
+    return this.request('/swap/execute', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async getSwapHistory(): Promise<APIResponse<SwapTransaction[]>> {
-    return this.request('/api/swap/history');
+  async getSwapHistory(): Promise<APIResponse<any>> {
+    return this.request('/swap/history');
   }
 
-  async getSupportedTokens(chainId: number): Promise<APIResponse<any[]>> {
-    return this.request(`/api/swap/tokens/${chainId}`);
+  async getSupportedTokens(chainId: number): Promise<APIResponse<any>> {
+    return this.request(`/swap/tokens/${chainId}`);
   }
 
-  // GM Operations
-  async postGM(chainIds: number[]): Promise<APIResponse<GMPost[]>> {
-    return this.request('/api/gm/post', {
+  // GM Operations APIs
+  async postGM(data: any): Promise<APIResponse<any>> {
+    return this.request('/gm/post', {
       method: 'POST',
-      body: JSON.stringify({ chainIds }),
+      body: JSON.stringify(data),
     });
   }
 
-  async getGMStreak(): Promise<APIResponse<Record<number, number>>> {
-    return this.request('/api/gm/streak');
+  async getGMStreak(): Promise<APIResponse<any>> {
+    return this.request('/gm/streak');
   }
 
-  async getGMHistory(): Promise<APIResponse<GMPost[]>> {
-    return this.request('/api/gm/history');
+  async getGMHistory(): Promise<APIResponse<any>> {
+    return this.request('/gm/history');
   }
 
   async getBatchGMStatus(id: string): Promise<APIResponse<any>> {
-    return this.request(`/api/gm/batch/${id}`);
+    return this.request(`/gm/batch/${id}`);
   }
 
-  // Analytics
+  // Analytics APIs
   async getAnalyticsOverview(): Promise<APIResponse<AnalyticsOverview>> {
-    return this.request('/api/analytics/overview');
+    return this.request('/analytics/overview');
   }
 
   async getChainMetrics(): Promise<APIResponse<ChainMetrics[]>> {
-    return this.request('/api/analytics/chains');
+    return this.request('/analytics/chains');
   }
 
   async getQualificationScore(): Promise<APIResponse<QualificationData[]>> {
-    return this.request('/api/analytics/qualification');
+    return this.request('/analytics/qualification');
   }
 
   async getROIMetrics(): Promise<APIResponse<any>> {
-    return this.request('/api/analytics/roi');
+    return this.request('/analytics/roi');
   }
 
-  // User Management
+  // User Management APIs
   async getUserProfile(): Promise<APIResponse<any>> {
-    return this.request('/api/user/profile');
+    return this.request('/user/profile');
   }
 
-  async updateUserSettings(settings: Record<string, any>): Promise<APIResponse<any>> {
-    return this.request('/api/user/settings', {
+  async updateUserSettings(data: any): Promise<APIResponse<any>> {
+    return this.request('/user/settings', {
       method: 'PUT',
-      body: JSON.stringify(settings),
+      body: JSON.stringify(data),
     });
   }
 
-  async getTransactionHistory(): Promise<APIResponse<any[]>> {
-    return this.request('/api/user/transactions');
+  async getTransactionHistory(): Promise<APIResponse<any>> {
+    return this.request('/user/transactions');
   }
 }
 
-export const apiService = new ApiService();
+export const apiService = new APIService();

@@ -1,16 +1,6 @@
 
 import { create } from 'zustand';
-import { 
-  WalletState, 
-  ChainStatus, 
-  DeploymentStatus, 
-  SwapTransaction, 
-  GMPost, 
-  AnalyticsOverview, 
-  ChainMetrics, 
-  QualificationData, 
-  Notification 
-} from '@/types';
+import { ChainStatus, WalletState, DeploymentStatus, SwapTransaction, GMPost, AnalyticsOverview, ChainMetrics, QualificationData, Notification } from '@/types';
 
 interface AppState {
   // Wallet State
@@ -18,121 +8,113 @@ interface AppState {
   setWallet: (wallet: Partial<WalletState>) => void;
   
   // Chains State
-  selectedChains: string[];
   chainStatus: Record<string, ChainStatus>;
-  gasPrice: Record<string, string>;
-  setSelectedChains: (chains: string[]) => void;
   setChainStatus: (status: Record<string, ChainStatus>) => void;
-  setGasPrice: (chainId: string, price: string) => void;
   
   // Activities State
   deployments: DeploymentStatus[];
-  swaps: SwapTransaction[];
-  gmPosts: GMPost[];
-  setDeployments: (deployments: DeploymentStatus[]) => void;
-  setSwaps: (swaps: SwapTransaction[]) => void;
-  setGMPosts: (posts: GMPost[]) => void;
   addDeployment: (deployment: DeploymentStatus) => void;
+  updateDeployment: (id: string, updates: Partial<DeploymentStatus>) => void;
+  
+  swaps: SwapTransaction[];
   addSwap: (swap: SwapTransaction) => void;
+  updateSwap: (id: string, updates: Partial<SwapTransaction>) => void;
+  
+  gmPosts: GMPost[];
   addGMPost: (post: GMPost) => void;
+  updateGMPost: (id: string, updates: Partial<GMPost>) => void;
   
   // Analytics State
   analyticsOverview: AnalyticsOverview | null;
-  chainMetrics: ChainMetrics[];
-  qualificationData: QualificationData[];
   setAnalyticsOverview: (overview: AnalyticsOverview) => void;
+  
+  chainMetrics: ChainMetrics[];
   setChainMetrics: (metrics: ChainMetrics[]) => void;
+  
+  qualificationData: QualificationData[];
   setQualificationData: (data: QualificationData[]) => void;
   
-  // UI State
-  isLoading: boolean;
-  activeModal: string | null;
+  // Notifications
   notifications: Notification[];
-  setIsLoading: (loading: boolean) => void;
-  setActiveModal: (modal: string | null) => void;
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
-  removeNotification: (id: string) => void;
   markNotificationAsRead: (id: string) => void;
+  clearNotification: (id: string) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  // Initial Wallet State
+  // Initial wallet state
   wallet: {
     address: null,
     isConnected: false,
     chainId: null,
     balance: undefined,
   },
-  setWallet: (walletUpdate) => 
-    set((state) => ({
-      wallet: { ...state.wallet, ...walletUpdate }
-    })),
-
-  // Initial Chains State
-  selectedChains: [],
+  setWallet: (wallet) => set((state) => ({ 
+    wallet: { ...state.wallet, ...wallet } 
+  })),
+  
+  // Initial chain status
   chainStatus: {},
-  gasPrice: {},
-  setSelectedChains: (chains) => set({ selectedChains: chains }),
   setChainStatus: (status) => set({ chainStatus: status }),
-  setGasPrice: (chainId, price) => 
-    set((state) => ({
-      gasPrice: { ...state.gasPrice, [chainId]: price }
-    })),
-
-  // Initial Activities State
+  
+  // Deployments
   deployments: [],
+  addDeployment: (deployment) => set((state) => ({ 
+    deployments: [...state.deployments, deployment] 
+  })),
+  updateDeployment: (id, updates) => set((state) => ({
+    deployments: state.deployments.map(d => 
+      d.id === id ? { ...d, ...updates } : d
+    )
+  })),
+  
+  // Swaps
   swaps: [],
+  addSwap: (swap) => set((state) => ({ 
+    swaps: [...state.swaps, swap] 
+  })),
+  updateSwap: (id, updates) => set((state) => ({
+    swaps: state.swaps.map(s => 
+      s.id === id ? { ...s, ...updates } : s
+    )
+  })),
+  
+  // GM Posts
   gmPosts: [],
-  setDeployments: (deployments) => set({ deployments }),
-  setSwaps: (swaps) => set({ swaps }),
-  setGMPosts: (posts) => set({ gmPosts: posts }),
-  addDeployment: (deployment) => 
-    set((state) => ({
-      deployments: [...state.deployments, deployment]
-    })),
-  addSwap: (swap) => 
-    set((state) => ({
-      swaps: [...state.swaps, swap]
-    })),
-  addGMPost: (post) => 
-    set((state) => ({
-      gmPosts: [...state.gmPosts, post]
-    })),
-
-  // Initial Analytics State
+  addGMPost: (post) => set((state) => ({ 
+    gmPosts: [...state.gmPosts, post] 
+  })),
+  updateGMPost: (id, updates) => set((state) => ({
+    gmPosts: state.gmPosts.map(g => 
+      g.id === id ? { ...g, ...updates } : g
+    )
+  })),
+  
+  // Analytics
   analyticsOverview: null,
-  chainMetrics: [],
-  qualificationData: [],
   setAnalyticsOverview: (overview) => set({ analyticsOverview: overview }),
+  
+  chainMetrics: [],
   setChainMetrics: (metrics) => set({ chainMetrics: metrics }),
+  
+  qualificationData: [],
   setQualificationData: (data) => set({ qualificationData: data }),
-
-  // Initial UI State
-  isLoading: false,
-  activeModal: null,
+  
+  // Notifications
   notifications: [],
-  setIsLoading: (loading) => set({ isLoading: loading }),
-  setActiveModal: (modal) => set({ activeModal: modal }),
-  addNotification: (notification) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    const timestamp = Date.now();
-    set((state) => ({
-      notifications: [...state.notifications, { 
-        ...notification, 
-        id, 
-        timestamp, 
-        read: false 
-      }]
-    }));
-  },
-  removeNotification: (id) => 
-    set((state) => ({
-      notifications: state.notifications.filter(n => n.id !== id)
-    })),
-  markNotificationAsRead: (id) => 
-    set((state) => ({
-      notifications: state.notifications.map(n => 
-        n.id === id ? { ...n, read: true } : n
-      )
-    })),
+  addNotification: (notification) => set((state) => ({
+    notifications: [...state.notifications, {
+      ...notification,
+      id: `notif-${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+    }]
+  })),
+  markNotificationAsRead: (id) => set((state) => ({
+    notifications: state.notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    )
+  })),
+  clearNotification: (id) => set((state) => ({
+    notifications: state.notifications.filter(n => n.id !== id)
+  })),
 }));
