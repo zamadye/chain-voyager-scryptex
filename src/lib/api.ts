@@ -2,7 +2,7 @@
 import { APIResponse, ChainStatus, AnalyticsOverview, ChainMetrics, QualificationData } from '@/types';
 
 // API base configuration
-const API_BASE_URL = process.env.VITE_API_BASE_URL || '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 class APIService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<APIResponse<T>> {
