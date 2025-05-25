@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +12,8 @@ import {
   Link as ChainIcon,
   User,
   History,
-  Zap
+  Zap,
+  ChevronUp
 } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { SUPPORTED_CHAINS } from '@/lib/chains';
@@ -21,6 +21,13 @@ import { SUPPORTED_CHAINS } from '@/lib/chains';
 const Sidebar = ({ className }: { className?: string }) => {
   const location = useLocation();
   const { chainStatus, deployments, swaps, gmPosts } = useAppStore();
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const navigation = [
     {
@@ -144,6 +151,19 @@ const Sidebar = ({ className }: { className?: string }) => {
               </Button>
             </Link>
           </div>
+        </div>
+
+        {/* Back to Top Button */}
+        <div className="mt-6 px-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollToTop}
+            className="w-full text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+          >
+            <ChevronUp className="mr-2 h-4 w-4" />
+            Back to Top
+          </Button>
         </div>
       </ScrollArea>
     </div>
