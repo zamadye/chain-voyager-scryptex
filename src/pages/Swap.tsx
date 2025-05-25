@@ -45,7 +45,7 @@ const Swap = () => {
       chainId: parseInt(selectedChain),
       fromToken,
       toToken,
-      amount: parseFloat(amount),
+      amount: amount,
       slippage: parseFloat(slippage),
       status: 'pending' as const,
       timestamp: Date.now(),

@@ -11,7 +11,7 @@ import GM from "./pages/GM";
 import Analytics from "./pages/Analytics";
 import Chains from "./pages/Chains";
 import Profile from "./pages/Profile";
-import History from "./pages/History";
+import HistoryPage from "./pages/History";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,7 +30,7 @@ const App = () => (
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/chains" element={<Chains />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/history" element={<History />} />
+          <Route path="/history" element={<HistoryPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

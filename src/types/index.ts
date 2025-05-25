@@ -19,6 +19,7 @@ export interface ChainStatus {
   blockHeight?: number;
   gasPrice?: string;
   lastUpdated: number;
+  latency?: number;
 }
 
 export interface WalletState {
@@ -36,6 +37,11 @@ export interface DeploymentStatus {
   txHash?: string;
   template: string;
   timestamp: number;
+  contractName?: string;
+  contractCode?: string;
+  constructorArgs?: string;
+  gasUsed?: string;
+  deploymentCost?: string;
 }
 
 export interface SwapTransaction {
@@ -47,6 +53,10 @@ export interface SwapTransaction {
   status: 'pending' | 'confirmed' | 'failed';
   txHash?: string;
   timestamp: number;
+  slippage?: number;
+  amountOut?: string;
+  gasUsed?: string;
+  priceImpact?: string;
 }
 
 export interface GMPost {

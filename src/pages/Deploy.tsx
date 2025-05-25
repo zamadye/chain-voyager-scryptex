@@ -46,6 +46,7 @@ const Deploy = () => {
       contractName,
       contractCode,
       constructorArgs,
+      template: contractName,
       status: 'pending' as const,
       timestamp: Date.now(),
       txHash: null,

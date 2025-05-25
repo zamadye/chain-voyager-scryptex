@@ -8,9 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { useAppStore } from '@/stores/useAppStore';
 import { SUPPORTED_CHAINS } from '@/lib/chains';
-import { history, Search, Filter, ExternalLink, Clock, CheckCircle, XCircle, Loader } from 'lucide-react';
+import { History, Search, Filter, ExternalLink, Clock, CheckCircle, XCircle, Loader } from 'lucide-react';
 
-const History = () => {
+const HistoryPage = () => {
   const { deployments, swaps, gmPosts } = useAppStore();
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +19,7 @@ const History = () => {
     ...deployments.map(d => ({
       ...d,
       type: 'deployment' as const,
-      title: `Deploy ${d.contractName}`,
+      title: `Deploy ${d.contractName || d.template}`,
       chain: Object.values(SUPPORTED_CHAINS).find(c => c.id === d.chainId)?.name || 'Unknown'
     })),
     ...swaps.map(s => ({
@@ -48,7 +48,7 @@ const History = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'confirmed':
         return <CheckCircle className="h-4 w-4 text-green-400" />;
       case 'failed':
         return <XCircle className="h-4 w-4 text-red-400" />;
@@ -61,8 +61,8 @@ const History = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Completed</Badge>;
+      case 'confirmed':
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Confirmed</Badge>;
       case 'failed':
         return <Badge className="bg-red-500/20 text-red-400 border-red-500/50">Failed</Badge>;
       case 'pending':
@@ -87,7 +87,7 @@ const History = () => {
 
   const stats = {
     total: allTransactions.length,
-    completed: allTransactions.filter(tx => tx.status === 'completed').length,
+    confirmed: allTransactions.filter(tx => tx.status === 'confirmed').length,
     pending: allTransactions.filter(tx => tx.status === 'pending').length,
     failed: allTransactions.filter(tx => tx.status === 'failed').length
   };
@@ -99,7 +99,7 @@ const History = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center">
-              <history className="mr-3 h-8 w-8 text-orange-400" />
+              <History className="mr-3 h-8 w-8 text-orange-400" />
               Transaction History
             </h1>
             <p className="text-gray-400 mt-2">View all your blockchain activities across chains</p>
@@ -119,8 +119,8 @@ const History = () => {
           </Card>
           <Card className="bg-gray-900/50 border-gray-800">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-400">{stats.completed}</div>
-              <div className="text-gray-400 text-sm">Completed</div>
+              <div className="text-2xl font-bold text-green-400">{stats.confirmed}</div>
+              <div className="text-gray-400 text-sm">Confirmed</div>
             </CardContent>
           </Card>
           <Card className="bg-gray-900/50 border-gray-800">
@@ -238,4 +238,4 @@ const History = () => {
   );
 };
 
-export default History;
+export default HistoryPage;
