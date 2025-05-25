@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useAccount, useChainId } from 'wagmi';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,11 +8,15 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAppStore } from '@/stores/useAppStore';
 import { SUPPORTED_CHAINS } from '@/lib/chains';
-import { Sun, Calendar, Target, Flame } from 'lucide-react';
+import { Web3Service } from '@/lib/web3-service';
+import { Sun, Calendar, Target, Flame, Loader2 } from 'lucide-react';
 
 const GM = () => {
-  const { wallet, addGMPost, addNotification } = useAppStore();
+  const { isConnected } = useAccount();
+  const currentChainId = useChainId();
+  const { addGMPost, addNotification } = useAppStore();
   const [selectedChains, setSelectedChains] = useState<string[]>([]);
+  const [isPosting, setIsPosting] = useState(false);
 
   const handleChainToggle = (chainKey: string, checked: boolean) => {
     if (checked) {
@@ -21,8 +26,8 @@ const GM = () => {
     }
   };
 
-  const handleBatchGM = () => {
-    if (!wallet.isConnected) {
+  const handleBatchGM = async () => {
+    if (!isConnected) {
       addNotification({
         type: 'warning',
         title: 'Wallet not connected',
@@ -42,35 +47,78 @@ const GM = () => {
       return;
     }
 
-    selectedChains.forEach(chainKey => {
-      const chain = SUPPORTED_CHAINS[chainKey];
-      const gmPost = {
-        id: `gm-${Date.now()}-${chainKey}`,
-        chainId: chain.id,
-        message: 'GM! 🌅',
-        status: 'pending' as const,
-        timestamp: Date.now(),
-        txHash: null,
-        gasUsed: null
-      };
+    setIsPosting(true);
 
-      addGMPost(gmPost);
-    });
+    try {
+      // Post GM to each selected chain
+      for (const chainKey of selectedChains) {
+        const chain = SUPPORTED_CHAINS[chainKey];
+        
+        const gmPost = {
+          id: `gm-${Date.now()}-${chainKey}`,
+          chainId: chain.id,
+          status: 'pending' as const,
+          timestamp: Date.now(),
+          txHash: null
+        };
 
-    addNotification({
-      type: 'success',
-      title: 'GM posts initiated',
-      message: `Posted GM to ${selectedChains.length} chains. Building that streak! 🔥`,
-      read: false
-    });
+        addGMPost(gmPost);
 
-    setSelectedChains([]);
+        try {
+          const result = await Web3Service.postGM(chain.id);
+          
+          // Update with success
+          addGMPost({
+            ...gmPost,
+            status: 'confirmed',
+            txHash: result.txHash,
+          });
+
+          addNotification({
+            type: 'success',
+            title: `GM posted on ${chain.name}!`,
+            message: `Transaction: ${result.txHash}`,
+            read: false
+          });
+
+        } catch (error) {
+          console.error(`GM post failed on ${chain.name}:`, error);
+          
+          // Update with failure
+          addGMPost({
+            ...gmPost,
+            status: 'failed',
+          });
+
+          addNotification({
+            type: 'error',
+            title: `GM failed on ${chain.name}`,
+            message: error instanceof Error ? error.message : 'Unknown error',
+            read: false
+          });
+        }
+      }
+
+      // Update streak in localStorage
+      const currentStreak = parseInt(localStorage.getItem('gmStreak') || '0');
+      const lastGMDate = localStorage.getItem('lastGMDate');
+      const today = new Date().toDateString();
+      
+      if (lastGMDate !== today) {
+        localStorage.setItem('gmStreak', (currentStreak + 1).toString());
+        localStorage.setItem('lastGMDate', today);
+      }
+
+    } finally {
+      setIsPosting(false);
+      setSelectedChains([]);
+    }
   };
 
   const streakData = {
-    current: 7,
-    longest: 15,
-    total: 42
+    current: parseInt(localStorage.getItem('gmStreak') || '0'),
+    longest: parseInt(localStorage.getItem('longestGMStreak') || '0'),
+    total: parseInt(localStorage.getItem('totalGMs') || '0')
   };
 
   return (
@@ -112,6 +160,7 @@ const GM = () => {
                         checked={selectedChains.includes(key)}
                         onCheckedChange={(checked) => handleChainToggle(key, checked as boolean)}
                         className="border-gray-600"
+                        disabled={isPosting}
                       />
                       <label
                         htmlFor={key}
@@ -139,9 +188,16 @@ const GM = () => {
                 <Button
                   onClick={handleBatchGM}
                   className="w-full mt-6 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700"
-                  disabled={!wallet.isConnected || selectedChains.length === 0}
+                  disabled={!isConnected || selectedChains.length === 0 || isPosting}
                 >
-                  Post GM to {selectedChains.length} Chain{selectedChains.length !== 1 ? 's' : ''}
+                  {isPosting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Posting GM...
+                    </>
+                  ) : (
+                    `Post GM to ${selectedChains.length} Chain${selectedChains.length !== 1 ? 's' : ''}`
+                  )}
                 </Button>
               </CardContent>
             </Card>

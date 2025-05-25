@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useAccount, useChainId } from 'wagmi';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,17 +11,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/stores/useAppStore';
 import { SUPPORTED_CHAINS } from '@/lib/chains';
-import { Rocket, Code, Settings, CheckCircle } from 'lucide-react';
+import { Web3Service } from '@/lib/web3-service';
+import { CONTRACT_TEMPLATES } from '@/lib/contract-templates';
+import { Rocket, Code, Settings, CheckCircle, Loader2 } from 'lucide-react';
 
 const Deploy = () => {
-  const { wallet, addDeployment, addNotification } = useAppStore();
-  const [selectedChain, setSelectedChain] = useState('');
+  const { isConnected } = useAccount();
+  const currentChainId = useChainId();
+  const { addDeployment, addNotification } = useAppStore();
+  const [selectedChain, setSelectedChain] = useState(currentChainId?.toString() || '');
+  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [contractName, setContractName] = useState('');
-  const [contractCode, setContractCode] = useState('');
   const [constructorArgs, setConstructorArgs] = useState('');
+  const [isDeploying, setIsDeploying] = useState(false);
 
-  const handleDeploy = () => {
-    if (!wallet.isConnected) {
+  const handleDeploy = async () => {
+    if (!isConnected) {
       addNotification({
         type: 'warning',
         title: 'Wallet not connected',
@@ -30,7 +36,7 @@ const Deploy = () => {
       return;
     }
 
-    if (!selectedChain || !contractName || !contractCode) {
+    if (!selectedChain || !selectedTemplate || !contractName) {
       addNotification({
         type: 'error',
         title: 'Missing information',
@@ -40,41 +46,72 @@ const Deploy = () => {
       return;
     }
 
-    const deployment = {
-      id: `deploy-${Date.now()}`,
-      chainId: parseInt(selectedChain),
-      contractName,
-      contractCode,
-      constructorArgs,
-      template: contractName,
-      status: 'pending' as const,
-      timestamp: Date.now(),
-      txHash: null,
-      contractAddress: null,
-      gasUsed: null,
-      deploymentCost: null
-    };
+    setIsDeploying(true);
 
-    addDeployment(deployment);
-    addNotification({
-      type: 'success',
-      title: 'Deployment started',
-      message: `Contract ${contractName} deployment initiated on ${SUPPORTED_CHAINS[Object.keys(SUPPORTED_CHAINS).find(k => SUPPORTED_CHAINS[k].id === parseInt(selectedChain))]?.name}.`,
-      read: false
-    });
+    try {
+      const args = constructorArgs ? constructorArgs.split(',').map(arg => arg.trim()) : [];
+      
+      const deployment = {
+        id: `deploy-${Date.now()}`,
+        chainId: parseInt(selectedChain),
+        contractName,
+        template: selectedTemplate,
+        status: 'pending' as const,
+        timestamp: Date.now(),
+        txHash: null,
+        contractAddress: null,
+        gasUsed: null,
+        deploymentCost: null,
+        constructorArgs
+      };
 
-    // Reset form
-    setContractName('');
-    setContractCode('');
-    setConstructorArgs('');
+      addDeployment(deployment);
+
+      const result = await Web3Service.deployContract(
+        parseInt(selectedChain),
+        selectedTemplate,
+        contractName,
+        args
+      );
+
+      // Update deployment with results
+      addDeployment({
+        ...deployment,
+        status: 'confirmed',
+        txHash: result.txHash,
+        contractAddress: result.contractAddress,
+        gasUsed: result.gasUsed,
+      });
+
+      addNotification({
+        type: 'success',
+        title: 'Contract deployed successfully!',
+        message: `${contractName} deployed at ${result.contractAddress}`,
+        read: false
+      });
+
+      // Reset form
+      setContractName('');
+      setConstructorArgs('');
+      setSelectedTemplate('');
+
+    } catch (error) {
+      console.error('Deployment failed:', error);
+      addNotification({
+        type: 'error',
+        title: 'Deployment failed',
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        read: false
+      });
+    } finally {
+      setIsDeploying(false);
+    }
   };
 
-  const contractTemplates = [
-    { name: 'ERC20 Token', description: 'Standard fungible token contract' },
-    { name: 'ERC721 NFT', description: 'Non-fungible token contract' },
-    { name: 'Multisig Wallet', description: 'Multi-signature wallet contract' },
-    { name: 'Custom Contract', description: 'Write your own contract' }
-  ];
+  const contractTemplates = Object.keys(CONTRACT_TEMPLATES).map(key => ({
+    name: key,
+    description: `Deploy a ${key} contract`
+  }));
 
   return (
     <Layout>
@@ -107,8 +144,15 @@ const Deploy = () => {
                 {contractTemplates.map((template) => (
                   <div
                     key={template.name}
-                    className="p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 cursor-pointer transition-colors border border-gray-700 hover:border-purple-500/50"
-                    onClick={() => setContractName(template.name)}
+                    className={`p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 cursor-pointer transition-colors border ${
+                      selectedTemplate === template.name 
+                        ? 'border-purple-500/50' 
+                        : 'border-gray-700 hover:border-purple-500/50'
+                    }`}
+                    onClick={() => {
+                      setSelectedTemplate(template.name);
+                      setContractName(template.name);
+                    }}
                   >
                     <h3 className="text-white font-medium">{template.name}</h3>
                     <p className="text-gray-400 text-sm">{template.description}</p>
@@ -157,18 +201,7 @@ const Deploy = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="contractCode" className="text-white">Contract Code</Label>
-                  <Textarea
-                    id="contractCode"
-                    value={contractCode}
-                    onChange={(e) => setContractCode(e.target.value)}
-                    placeholder="pragma solidity ^0.8.0;..."
-                    className="bg-gray-800 border-gray-700 text-white min-h-[200px] font-mono text-sm"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="constructorArgs" className="text-white">Constructor Arguments (optional)</Label>
+                  <Label htmlFor="constructorArgs" className="text-white">Constructor Arguments (comma separated)</Label>
                   <Input
                     id="constructorArgs"
                     value={constructorArgs}
@@ -181,10 +214,19 @@ const Deploy = () => {
                 <Button
                   onClick={handleDeploy}
                   className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
-                  disabled={!wallet.isConnected}
+                  disabled={!isConnected || isDeploying || !selectedTemplate}
                 >
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Deploy Contract
+                  {isDeploying ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Deploying Contract...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Deploy Contract
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>

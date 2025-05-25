@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Menu, X, Wallet, Bell } from 'lucide-react';
+import { Menu, X, Bell } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { wallet, notifications } = useAppStore();
+  const { notifications } = useAppStore();
   
   const unreadNotifications = notifications.filter(n => !n.read).length;
 
@@ -65,23 +66,8 @@ const Header = () => {
               )}
             </Button>
 
-            {/* Wallet Connection */}
-            <Button
-              variant={wallet.isConnected ? "outline" : "default"}
-              size="sm"
-              className={cn(
-                "font-medium",
-                wallet.isConnected 
-                  ? "border-purple-500/50 text-purple-400 hover:bg-purple-500/10" 
-                  : "bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
-              )}
-            >
-              <Wallet className="h-4 w-4 mr-2" />
-              {wallet.isConnected 
-                ? `${wallet.address?.slice(0, 6)}...${wallet.address?.slice(-4)}`
-                : "Connect Wallet"
-              }
-            </Button>
+            {/* RainbowKit Wallet Connection */}
+            <ConnectButton />
 
             {/* Mobile menu button */}
             <Button

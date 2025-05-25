@@ -1,6 +1,6 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 import Layout from '@/components/layout/Layout';
 import StatsOverview from '@/components/dashboard/StatsOverview';
 import ChainStatusCard from '@/components/dashboard/ChainStatusCard';
@@ -8,12 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/stores/useAppStore';
+import { useWeb3Status } from '@/hooks/useWeb3Status';
 import { SUPPORTED_CHAINS, getAllChains } from '@/lib/chains';
-import { apiService } from '@/lib/api';
-import { Activity, TrendingUp, AlertCircle } from 'lucide-react';
+import { Activity, AlertCircle } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { isConnected } = useAccount();
+  
+  // Initialize Web3 status monitoring
+  useWeb3Status();
+  
   const { 
     chainStatus, 
     setChainStatus, 
@@ -51,7 +56,7 @@ const Index = () => {
   }, [setChainStatus, addNotification]);
 
   const handleQuickAction = (action: 'deploy' | 'swap' | 'gm', chainId: number) => {
-    if (!wallet.isConnected) {
+    if (!isConnected) {
       addNotification({
         type: 'warning',
         title: 'Wallet not connected',
@@ -103,7 +108,7 @@ const Index = () => {
             </p>
           </div>
           
-          {!wallet.isConnected && (
+          {!isConnected && (
             <Card className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/30">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">
@@ -201,7 +206,7 @@ const Index = () => {
                 <Button
                   className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
                   onClick={() => navigate('/deploy')}
-                  disabled={!wallet.isConnected}
+                  disabled={!isConnected}
                 >
                   Deploy Contracts
                 </Button>
@@ -210,7 +215,7 @@ const Index = () => {
                   variant="outline"
                   className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
                   onClick={() => navigate('/swap')}
-                  disabled={!wallet.isConnected}
+                  disabled={!isConnected}
                 >
                   Token Swap
                 </Button>
@@ -219,7 +224,7 @@ const Index = () => {
                   variant="outline"
                   className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
                   onClick={() => navigate('/gm')}
-                  disabled={!wallet.isConnected}
+                  disabled={!isConnected}
                 >
                   Daily GM Ritual
                 </Button>
