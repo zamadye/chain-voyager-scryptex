@@ -1,6 +1,6 @@
 
-import { getContract, parseEther, formatEther } from 'viem';
 import { getPublicClient, getWalletClient } from '@wagmi/core';
+import { parseEther, formatEther } from 'viem';
 import { config } from './web3-config';
 import { getContractTemplate } from './contract-templates';
 
@@ -19,9 +19,9 @@ export class Web3Service {
 
     // Deploy the contract
     const hash = await walletClient.deployContract({
-      abi: template.abi,
+      abi: template.abi as any,
       bytecode: template.bytecode as `0x${string}`,
-      args: constructorArgs,
+      args: constructorArgs as any,
     });
 
     const publicClient = getPublicClient(config, { chainId });
@@ -41,11 +41,11 @@ export class Web3Service {
     const walletClient = await getWalletClient(config, { chainId });
     if (!walletClient) throw new Error('Wallet not connected');
 
-    // First deploy GM contract if needed (in real app, you'd store deployed addresses)
+    // First deploy GM contract if needed
     const deployHash = await walletClient.deployContract({
-      abi: template.abi,
+      abi: template.abi as any,
       bytecode: template.bytecode as `0x${string}`,
-      args: [],
+      args: [] as any,
     });
 
     const publicClient = getPublicClient(config, { chainId });
@@ -53,14 +53,14 @@ export class Web3Service {
     
     if (!deployReceipt?.contractAddress) throw new Error('Contract deployment failed');
 
-    // Now post GM
-    const contract = getContract({
+    // Now post GM using writeContract
+    const hash = await walletClient.writeContract({
       address: deployReceipt.contractAddress,
-      abi: template.abi,
-      client: walletClient,
+      abi: template.abi as any,
+      functionName: 'postGM',
+      args: [],
     });
 
-    const hash = await contract.write.postGM();
     const receipt = await publicClient?.waitForTransactionReceipt({ hash });
 
     return {
