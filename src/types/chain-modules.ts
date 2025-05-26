@@ -1,45 +1,4 @@
 
-// Chain module interface that all chain modules must implement
-export interface IChainModule {
-  // Deploy a contract template with parameters
-  deploy(template: string, params: DeployParams): Promise<DeployResult>;
-  
-  // Interact with deployed contracts for a user
-  interact(userAddress: string): Promise<InteractionResult>;
-  
-  // Validate a transaction hash
-  validate(txHash: string): Promise<ValidationResult>;
-}
-
-// Common types for chain modules
-export interface DeployParams {
-  contractName: string;
-  constructorArgs: any[];
-  gasLimit?: number;
-  value?: string;
-}
-
-export interface DeployResult {
-  success: boolean;
-  txHash: string;
-  contractAddress?: string;
-  error?: string;
-}
-
-export interface InteractionResult {
-  success: boolean;
-  txHash?: string;
-  data?: any;
-  error?: string;
-}
-
-export interface ValidationResult {
-  success: boolean;
-  confirmed: boolean;
-  blockNumber?: number;
-  error?: string;
-}
-
 // Chain module configuration
 export interface ChainModuleConfig {
   chainId: number;
@@ -49,4 +8,41 @@ export interface ChainModuleConfig {
   nativeCurrency: string;
   faucetUrl: string;
   docsUrl: string;
+}
+
+// Deployment parameters
+export interface DeployParams {
+  contractName: string;
+  constructorArgs: any[];
+}
+
+// Deployment result
+export interface DeployResult {
+  success: boolean;
+  txHash: string;
+  contractAddress?: string;
+  error?: string;
+}
+
+// Interaction result
+export interface InteractionResult {
+  success: boolean;
+  txHash?: string;
+  data?: any;
+  error?: string;
+}
+
+// Validation result
+export interface ValidationResult {
+  success: boolean;
+  confirmed: boolean;
+  blockNumber?: number;
+  error?: string;
+}
+
+// Chain module interface
+export interface IChainModule {
+  deploy(template: string, params: DeployParams): Promise<DeployResult>;
+  interact(userAddress: string): Promise<InteractionResult>;
+  validate(txHash: string): Promise<ValidationResult>;
 }

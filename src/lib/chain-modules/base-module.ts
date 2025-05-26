@@ -2,7 +2,7 @@
 import { IChainModule, ChainModuleConfig, DeployParams, DeployResult, InteractionResult, ValidationResult } from '@/types/chain-modules';
 import { getPublicClient, getWalletClient } from '@wagmi/core';
 import { config } from '@/lib/web3-config';
-import { parseEther, defineChain } from 'viem';
+import { defineChain } from 'viem';
 
 export abstract class BaseChainModule implements IChainModule {
   protected config: ChainModuleConfig;
@@ -24,11 +24,9 @@ export abstract class BaseChainModule implements IChainModule {
     });
   }
 
-  // Abstract methods that must be implemented by each chain
   abstract deploy(template: string, params: DeployParams): Promise<DeployResult>;
   abstract interact(userAddress: string): Promise<InteractionResult>;
 
-  // Common validation method that can be overridden if needed
   async validate(txHash: string): Promise<ValidationResult> {
     try {
       const publicClient = getPublicClient(config, { chainId: this.config.chainId as any });
@@ -52,7 +50,6 @@ export abstract class BaseChainModule implements IChainModule {
     }
   }
 
-  // Helper methods for common operations
   protected async getWalletClient() {
     const walletClient = await getWalletClient(config, { chainId: this.config.chainId as any });
     if (!walletClient) {

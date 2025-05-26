@@ -58,7 +58,6 @@ export class ZeroGModule extends BaseChainModule {
     try {
       const walletClient = await this.getWalletClient();
       
-      // Example interaction: Send a simple transaction
       const hash = await walletClient.sendTransaction({
         to: userAddress as `0x${string}`,
         value: parseEther('0.001'),
