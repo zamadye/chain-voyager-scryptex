@@ -24,7 +24,7 @@ export const useWeb3Status = () => {
   // Update chain status
   useEffect(() => {
     const updateChainStatus = async () => {
-      const statusMap: Record<string, any> = {};
+      const statusMap = new Map();
 
       for (const [key, chain] of Object.entries(SUPPORTED_CHAINS)) {
         try {
@@ -33,21 +33,21 @@ export const useWeb3Status = () => {
             Web3Service.getBlockNumber(chain.id),
           ]);
 
-          statusMap[key] = {
+          statusMap.set(key, {
             chainId: chain.id,
             isActive: true,
             blockHeight,
             gasPrice: parseFloat(gasPrice).toFixed(2),
             lastUpdated: Date.now(),
             latency: Math.random() * 100 + 50, // Mock latency
-          };
+          });
         } catch (error) {
           console.error(`Failed to get status for ${chain.name}:`, error);
-          statusMap[key] = {
+          statusMap.set(key, {
             chainId: chain.id,
             isActive: false,
             lastUpdated: Date.now(),
-          };
+          });
         }
       }
 

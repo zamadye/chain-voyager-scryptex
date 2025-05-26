@@ -1,24 +1,24 @@
 
 import { create } from 'zustand';
 
-// Define simple, explicit types for the store
-type WalletState = {
+// Simple state interfaces
+interface WalletData {
   address: string | null;
   isConnected: boolean;
   chainId: number | null;
   balance: string;
-};
+}
 
-type ChainStatus = {
+interface ChainData {
   chainId: number;
   isActive: boolean;
   blockHeight: number;
   gasPrice: string;
   lastUpdated: number;
   latency: number;
-};
+}
 
-type DeploymentStatus = {
+interface DeploymentData {
   id: string;
   chainId: number;
   contractAddress: string;
@@ -31,9 +31,9 @@ type DeploymentStatus = {
   constructorArgs: string;
   gasUsed: string;
   deploymentCost: string;
-};
+}
 
-type SwapTransaction = {
+interface SwapData {
   id: string;
   chainId: number;
   fromToken: string;
@@ -46,33 +46,33 @@ type SwapTransaction = {
   amountOut: string;
   gasUsed: string;
   priceImpact: string;
-};
+}
 
-type GMPost = {
+interface GMData {
   id: string;
   chainId: number;
   status: 'pending' | 'confirmed' | 'failed';
   txHash: string;
   timestamp: number;
-};
+}
 
-type AnalyticsOverview = {
+interface AnalyticsData {
   totalTransactions: number;
   totalGasSpent: string;
   chainsActive: number;
   streakDays: number;
   qualificationScore: number;
-};
+}
 
-type ChainMetrics = {
+interface ChainMetricsData {
   chainId: number;
   transactions: number;
   gasSpent: string;
   successRate: number;
   lastActivity: number;
-};
+}
 
-type QualificationData = {
+interface QualificationInfo {
   chainId: number;
   score: number;
   criteria: {
@@ -81,58 +81,59 @@ type QualificationData = {
     dailyActivity: boolean;
     volume: boolean;
   };
-};
+}
 
-type Notification = {
+interface NotificationData {
   id: string;
   type: 'success' | 'error' | 'info' | 'warning';
   title: string;
   message: string;
   timestamp: number;
   read: boolean;
-};
+}
 
-interface AppState {
-  // Wallet State
-  wallet: WalletState;
-  setWallet: (wallet: Partial<WalletState>) => void;
+// Store interface
+interface AppStore {
+  // Wallet
+  wallet: WalletData;
+  setWallet: (wallet: Partial<WalletData>) => void;
   
-  // Chains State
-  chainStatus: Record<string, ChainStatus>;
-  setChainStatus: (status: Record<string, ChainStatus>) => void;
+  // Chains - using Map instead of Record
+  chainStatus: Map<string, ChainData>;
+  setChainStatus: (status: Map<string, ChainData>) => void;
   
-  // Activities State
-  deployments: DeploymentStatus[];
-  addDeployment: (deployment: DeploymentStatus) => void;
-  updateDeployment: (id: string, updates: Partial<DeploymentStatus>) => void;
+  // Activities
+  deployments: DeploymentData[];
+  addDeployment: (deployment: DeploymentData) => void;
+  updateDeployment: (id: string, updates: Partial<DeploymentData>) => void;
   
-  swaps: SwapTransaction[];
-  addSwap: (swap: SwapTransaction) => void;
-  updateSwap: (id: string, updates: Partial<SwapTransaction>) => void;
+  swaps: SwapData[];
+  addSwap: (swap: SwapData) => void;
+  updateSwap: (id: string, updates: Partial<SwapData>) => void;
   
-  gmPosts: GMPost[];
-  addGMPost: (post: GMPost) => void;
-  updateGMPost: (id: string, updates: Partial<GMPost>) => void;
+  gmPosts: GMData[];
+  addGMPost: (post: GMData) => void;
+  updateGMPost: (id: string, updates: Partial<GMData>) => void;
   
-  // Analytics State
-  analyticsOverview: AnalyticsOverview | null;
-  setAnalyticsOverview: (overview: AnalyticsOverview) => void;
+  // Analytics
+  analyticsOverview: AnalyticsData | null;
+  setAnalyticsOverview: (overview: AnalyticsData) => void;
   
-  chainMetrics: ChainMetrics[];
-  setChainMetrics: (metrics: ChainMetrics[]) => void;
+  chainMetrics: ChainMetricsData[];
+  setChainMetrics: (metrics: ChainMetricsData[]) => void;
   
-  qualificationData: QualificationData[];
-  setQualificationData: (data: QualificationData[]) => void;
+  qualificationData: QualificationInfo[];
+  setQualificationData: (data: QualificationInfo[]) => void;
   
   // Notifications
-  notifications: Notification[];
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
+  notifications: NotificationData[];
+  addNotification: (notification: Omit<NotificationData, 'id' | 'timestamp'>) => void;
   markNotificationAsRead: (id: string) => void;
   clearNotification: (id: string) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  // Initial wallet state
+export const useAppStore = create<AppStore>((set) => ({
+  // Wallet state
   wallet: {
     address: null,
     isConnected: false,
@@ -143,8 +144,8 @@ export const useAppStore = create<AppState>((set) => ({
     wallet: { ...state.wallet, ...wallet } 
   })),
   
-  // Initial chain status
-  chainStatus: {},
+  // Chain status using Map
+  chainStatus: new Map(),
   setChainStatus: (status) => set({ chainStatus: status }),
   
   // Deployments
