@@ -109,9 +109,18 @@ export interface Notification {
   read: boolean;
 }
 
-export interface APIResponse<T = any> {
+// Simplified APIResponse without generic default parameter
+export interface APIResponse {
   success: boolean;
-  data?: T;
+  data?: unknown;
+  error?: string;
+  message?: string;
+}
+
+// Specific typed versions for common use cases
+export interface APIResponseWithData<T> {
+  success: boolean;
+  data: T;
   error?: string;
   message?: string;
 }
