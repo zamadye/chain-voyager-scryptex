@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { getAllChains } from '@/lib/chains';
 import { useAppStore } from '@/stores/useAppStore';
 import { ChainConfig } from '@/types';
-import { Activity, Zap, Search, Clock } from 'lucide-react';
+import { Activity, Zap, Search, Clock, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChainSelectorProps {
@@ -18,6 +18,7 @@ interface ChainSelectorProps {
 const ChainSelector = ({ onChainSelect, selectedChain }: ChainSelectorProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentChains, setRecentChains] = useState<ChainConfig[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { chainStatus } = useAppStore();
   
   const chains = getAllChains();
@@ -50,9 +51,12 @@ const ChainSelector = ({ onChainSelect, selectedChain }: ChainSelectorProps) => 
     chain.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleChainSelect = (chain: ChainConfig) => {
+  const handleChainSelect = async (chain: ChainConfig) => {
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
     onChainSelect(chain);
     saveRecentChain(chain);
+    setIsLoading(false);
   };
 
   const getChainStatus = (chainId: number) => {
@@ -63,14 +67,115 @@ const ChainSelector = ({ onChainSelect, selectedChain }: ChainSelectorProps) => 
     return key ? chainStatus[key] : null;
   };
 
+  const getChainLogo = (chainName: string) => {
+    // Generate dynamic logo path - will fallback to placeholder if not exists
+    const logoPath = `/chains/${chainName.toLowerCase().replace(/\s+/g, '-')}.svg`;
+    return logoPath;
+  };
+
+  const ChainCard = ({ chain, isRecent = false }: { chain: ChainConfig; isRecent?: boolean }) => {
+    const status = getChainStatus(chain.id);
+    const isActive = status?.isActive ?? false;
+    const isSelected = selectedChain?.id === chain.id;
+
+    return (
+      <Card
+        className={cn(
+          "bg-gray-900/50 border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer group",
+          "hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20",
+          isSelected && "border-blue-500 bg-blue-500/10 scale-105 shadow-lg shadow-blue-500/30",
+          isRecent && "ring-2 ring-purple-500/30"
+        )}
+        onClick={() => handleChainSelect(chain)}
+      >
+        <CardContent className={cn("p-4", isRecent ? "sm:p-3" : "sm:p-6")}>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center justify-between">
+              <div className={cn(
+                "h-3 w-3 sm:h-4 sm:w-4 rounded-full transition-all duration-300",
+                isActive ? "bg-green-500 shadow-green-500/50 shadow-lg animate-pulse" : "bg-gray-600"
+              )} />
+              <Badge 
+                variant={chain.testnet ? "secondary" : "default"}
+                className="text-xs"
+              >
+                {chain.testnet ? 'Testnet' : 'Mainnet'}
+              </Badge>
+            </div>
+            
+            <div className="text-center space-y-2">
+              {/* Chain Logo */}
+              <div className="flex justify-center mb-2">
+                <img
+                  src={getChainLogo(chain.name)}
+                  alt={`${chain.name} logo`}
+                  className={cn(
+                    "transition-all duration-300 group-hover:scale-110",
+                    isRecent ? "h-6 w-6 sm:h-8 sm:w-8" : "h-8 w-8 sm:h-10 sm:w-10"
+                  )}
+                  onError={(e) => {
+                    // Fallback to generic chain icon if logo doesn't exist
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    target.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                <Activity 
+                  className={cn(
+                    "hidden text-blue-400 transition-all duration-300 group-hover:scale-110",
+                    isRecent ? "h-6 w-6 sm:h-8 sm:w-8" : "h-8 w-8 sm:h-10 sm:w-10"
+                  )} 
+                />
+              </div>
+              
+              <h3 className={cn(
+                "text-white font-bold group-hover:text-blue-400 transition-colors",
+                isRecent ? "text-sm sm:text-base" : "text-base sm:text-lg"
+              )}>
+                {chain.name}
+              </h3>
+              <p className="text-gray-400 text-xs sm:text-sm">
+                Chain ID: {chain.id}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
+              <Zap className="h-3 w-3" />
+              <span>{isActive ? 'Online' : 'Offline'}</span>
+            </div>
+
+            {isSelected && (
+              <div className="flex justify-center">
+                <Badge className="bg-blue-500 text-white text-xs">
+                  Selected
+                </Badge>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-400 mx-auto" />
+          <p className="text-gray-400">Switching blockchain...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 px-4 sm:px-0">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
           Select Blockchain
         </h1>
-        <p className="text-gray-400 text-lg">
+        <p className="text-gray-400 text-sm sm:text-lg px-4">
           Choose your blockchain to access chain-specific modules and tools
         </p>
       </div>
@@ -82,7 +187,7 @@ const ChainSelector = ({ onChainSelect, selectedChain }: ChainSelectorProps) => 
           placeholder="Search chains..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-gray-900/50 border-gray-700 text-white"
+          className="pl-10 bg-gray-900/50 border-gray-700 text-white h-12 text-base"
         />
       </div>
 
@@ -93,42 +198,10 @@ const ChainSelector = ({ onChainSelect, selectedChain }: ChainSelectorProps) => 
             <Clock className="h-4 w-4" />
             <span className="text-sm">Recent Chains</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {recentChains.map((chain) => {
-              const status = getChainStatus(chain.id);
-              const isActive = status?.isActive ?? false;
-              
-              return (
-                <Card
-                  key={chain.id}
-                  className={cn(
-                    "bg-gray-900/50 border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer group",
-                    selectedChain?.id === chain.id && "border-blue-500 bg-blue-500/10"
-                  )}
-                  onClick={() => handleChainSelect(chain)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={cn(
-                          "h-3 w-3 rounded-full transition-all duration-300",
-                          isActive ? "bg-green-500 shadow-green-500/50 shadow-lg" : "bg-gray-600"
-                        )} />
-                        <div>
-                          <h3 className="text-white font-medium group-hover:text-blue-400 transition-colors">
-                            {chain.name}
-                          </h3>
-                          <Badge variant="secondary" className="text-xs mt-1">
-                            {chain.testnet ? 'Testnet' : 'Mainnet'}
-                          </Badge>
-                        </div>
-                      </div>
-                      <Activity className="h-4 w-4 text-gray-400 group-hover:text-blue-400 transition-colors" />
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {recentChains.map((chain) => (
+              <ChainCard key={`recent-${chain.id}`} chain={chain} isRecent={true} />
+            ))}
           </div>
         </div>
       )}
@@ -140,62 +213,10 @@ const ChainSelector = ({ onChainSelect, selectedChain }: ChainSelectorProps) => 
             {searchQuery ? `Search Results (${filteredChains.length})` : 'All Chains'}
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {filteredChains.map((chain) => {
-            const status = getChainStatus(chain.id);
-            const isActive = status?.isActive ?? false;
-            const isSelected = selectedChain?.id === chain.id;
-            
-            return (
-              <Card
-                key={chain.id}
-                className={cn(
-                  "bg-gray-900/50 border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer group hover:scale-105",
-                  isSelected && "border-blue-500 bg-blue-500/10 scale-105"
-                )}
-                onClick={() => handleChainSelect(chain)}
-              >
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className={cn(
-                        "h-4 w-4 rounded-full transition-all duration-300",
-                        isActive ? "bg-green-500 shadow-green-500/50 shadow-lg animate-pulse" : "bg-gray-600"
-                      )} />
-                      <Badge 
-                        variant={chain.testnet ? "secondary" : "default"}
-                        className="text-xs"
-                      >
-                        {chain.testnet ? 'Testnet' : 'Mainnet'}
-                      </Badge>
-                    </div>
-                    
-                    <div className="text-center space-y-2">
-                      <h3 className="text-white font-bold text-lg group-hover:text-blue-400 transition-colors">
-                        {chain.name}
-                      </h3>
-                      <p className="text-gray-400 text-sm">
-                        Chain ID: {chain.id}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
-                      <Zap className="h-3 w-3" />
-                      <span>{isActive ? 'Online' : 'Offline'}</span>
-                    </div>
-
-                    {isSelected && (
-                      <div className="flex justify-center">
-                        <Badge className="bg-blue-500 text-white">
-                          Selected
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+          {filteredChains.map((chain) => (
+            <ChainCard key={chain.id} chain={chain} />
+          ))}
         </div>
       </div>
     </div>
