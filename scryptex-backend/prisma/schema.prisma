@@ -1,0 +1,341 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique @map("wallet_address")
+  email         String?  @unique
+  username      String?  @unique
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  sessions            UserSession[]
+  preferences         UserPreferences?
+  userChains          UserChain[]
+  transactions        Transaction[]
+  contractDeployments ContractDeployment[]
+  swapTransactions    SwapTransaction[]
+  gmPosts             GMPost[]
+  userActivities      UserActivity[]
+  rewardTracking      RewardTracking[]
+  notifications       Notification[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  token        String   @unique
+  refreshToken String   @unique @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  isActive     Boolean  @default(true) @map("is_active")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model UserPreferences {
+  id                    String   @id @default(cuid())
+  userId                String   @unique @map("user_id")
+  defaultChains         Json?    @map("default_chains")
+  notificationSettings  Json?    @map("notification_settings")
+  theme                 String   @default("dark")
+  language              String   @default("en")
+  timezone              String   @default("UTC")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model Chain {
+  id             String  @id @default(cuid())
+  chainId        Int     @unique @map("chain_id")
+  name           String
+  rpcUrl         String  @map("rpc_url")
+  explorerUrl    String  @map("explorer_url")
+  faucetUrl      String? @map("faucet_url")
+  nativeCurrency String  @map("native_currency")
+  isTestnet      Boolean @default(true) @map("is_testnet")
+  isActive       Boolean @default(true) @map("is_active")
+  priority       Int     @default(0)
+  iconUrl        String? @map("icon_url")
+  description    String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  chainStatus         ChainStatus?
+  userChains          UserChain[]
+  transactions        Transaction[]
+  contractDeployments ContractDeployment[]
+  swapTransactions    SwapTransaction[]
+  gmPosts             GMPost[]
+  chainMetrics        ChainMetrics[]
+  userActivities      UserActivity[]
+  rewardTracking      RewardTracking[]
+
+  @@map("chains")
+}
+
+model ChainStatus {
+  id          String   @id @default(cuid())
+  chainId     String   @unique @map("chain_id")
+  blockHeight BigInt   @map("block_height")
+  gasPrice    String   @map("gas_price")
+  isHealthy   Boolean  @default(true) @map("is_healthy")
+  lastUpdated DateTime @default(now()) @map("last_updated")
+  avgBlockTime Float?  @map("avg_block_time")
+  networkLoad  String?  @map("network_load")
+
+  // Relations
+  chain Chain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+
+  @@map("chain_status")
+}
+
+model UserChain {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  chainId       String   @map("chain_id")
+  isActive      Boolean  @default(true) @map("is_active")
+  priorityOrder Int      @default(0) @map("priority_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chain Chain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chainId])
+  @@map("user_chains")
+}
+
+model ContractTemplate {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  category       String
+  solidityCode   String   @map("solidity_code")
+  abi            Json
+  bytecode       String
+  parameters     Json?
+  gasEstimate    String?  @map("gas_estimate")
+  isActive       Boolean  @default(true) @map("is_active")
+  version        String   @default("1.0.0")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  contractDeployments ContractDeployment[]
+
+  @@map("contract_templates")
+}
+
+model ContractDeployment {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  chainId         String    @map("chain_id")
+  templateId      String    @map("template_id")
+  contractAddress String?   @map("contract_address")
+  transactionHash String    @map("transaction_hash")
+  status          String    @default("pending")
+  gasUsed         String?   @map("gas_used")
+  gasPrice        String?   @map("gas_price")
+  deploymentCost  String?   @map("deployment_cost")
+  blockNumber     BigInt?   @map("block_number")
+  errorMessage    String?   @map("error_message")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  confirmedAt     DateTime? @map("confirmed_at")
+
+  // Relations
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chain    Chain            @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  template ContractTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  parameters DeploymentParameter[]
+
+  @@map("contract_deployments")
+}
+
+model DeploymentParameter {
+  id           String @id @default(cuid())
+  deploymentId String @map("deployment_id")
+  parameterName String @map("parameter_name")
+  parameterValue String @map("parameter_value")
+  parameterType String @map("parameter_type")
+
+  // Relations
+  deployment ContractDeployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  @@map("deployment_parameters")
+}
+
+model Transaction {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  chainId         String    @map("chain_id")
+  transactionHash String    @map("transaction_hash")
+  transactionType String    @map("transaction_type")
+  status          String    @default("pending")
+  gasUsed         String?   @map("gas_used")
+  gasPrice        String?   @map("gas_price")
+  blockNumber     BigInt?   @map("block_number")
+  fromAddress     String?   @map("from_address")
+  toAddress       String?   @map("to_address")
+  value           String?
+  data            String?
+  nonce           Int?
+  errorMessage    String?   @map("error_message")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  confirmedAt     DateTime? @map("confirmed_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chain Chain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model SwapTransaction {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  fromChainId  String    @map("from_chain_id")
+  toChainId    String?   @map("to_chain_id")
+  fromToken    String    @map("from_token")
+  toToken      String    @map("to_token")
+  amountIn     String    @map("amount_in")
+  amountOut    String?   @map("amount_out")
+  slippage     Float     @default(0.5)
+  swapType     String    @map("swap_type")
+  dexProtocol  String?   @map("dex_protocol")
+  status       String    @default("pending")
+  txHash       String?   @map("tx_hash")
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  completedAt  DateTime? @map("completed_at")
+
+  // Relations
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fromChain Chain @relation(fields: [fromChainId], references: [id], onDelete: Cascade)
+
+  @@map("swap_transactions")
+}
+
+model GMPost {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  chainId         String   @map("chain_id")
+  message         String   @default("GM")
+  transactionHash String   @map("transaction_hash")
+  postDate        DateTime @map("post_date")
+  streakCount     Int      @default(1) @map("streak_count")
+  gasUsed         String?  @map("gas_used")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chain Chain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+
+  @@map("gm_posts")
+}
+
+model UserActivity {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  activityType String   @map("activity_type")
+  chainId      String?  @map("chain_id")
+  metadata     Json?
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chain Chain? @relation(fields: [chainId], references: [id], onDelete: SetNull)
+
+  @@map("user_activities")
+}
+
+model ChainMetrics {
+  id                 String   @id @default(cuid())
+  chainId            String   @map("chain_id")
+  totalTransactions  BigInt   @default(0) @map("total_transactions")
+  totalDeployments   BigInt   @default(0) @map("total_deployments")
+  avgGasPrice        String   @map("avg_gas_price")
+  totalVolume        String   @default("0") @map("total_volume")
+  activeUsers        Int      @default(0) @map("active_users")
+  date               DateTime @default(now())
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  // Relations
+  chain Chain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+
+  @@unique([chainId, date])
+  @@map("chain_metrics")
+}
+
+model RewardTracking {
+  id                  String   @id @default(cuid())
+  userId              String   @map("user_id")
+  chainId             String   @map("chain_id")
+  estimatedReward     String   @default("0") @map("estimated_reward")
+  qualificationScore  Float    @default(0) @map("qualification_score")
+  totalTransactions   Int      @default(0) @map("total_transactions")
+  totalDeployments    Int      @default(0) @map("total_deployments")
+  totalVolume         String   @default("0") @map("total_volume")
+  lastActivityDate    DateTime? @map("last_activity_date")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chain Chain @relation(fields: [chainId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chainId])
+  @@map("reward_tracking")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false) @map("is_read")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  readAt    DateTime? @map("read_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  type      String   @default("string")
+  category  String   @default("general")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("system_config")
+}
