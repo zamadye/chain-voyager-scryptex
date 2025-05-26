@@ -41,13 +41,13 @@ interface AppState {
   clearNotification: (id: string) => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+export const useAppStore = create<AppState>((set) => ({
   // Initial wallet state
   wallet: {
     address: null,
     isConnected: false,
     chainId: null,
-    balance: undefined,
+    balance: '0',
   },
   setWallet: (wallet) => set((state) => ({ 
     wallet: { ...state.wallet, ...wallet } 

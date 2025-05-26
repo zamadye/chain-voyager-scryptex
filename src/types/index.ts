@@ -16,32 +16,32 @@ export interface ChainConfig {
 export interface ChainStatus {
   chainId: number;
   isActive: boolean;
-  blockHeight?: number;
-  gasPrice?: string;
+  blockHeight: number;
+  gasPrice: string;
   lastUpdated: number;
-  latency?: number;
+  latency: number;
 }
 
 export interface WalletState {
   address: string | null;
   isConnected: boolean;
   chainId: number | null;
-  balance?: string;
+  balance: string;
 }
 
 export interface DeploymentStatus {
   id: string;
   chainId: number;
-  contractAddress?: string;
+  contractAddress: string;
   status: 'pending' | 'confirmed' | 'failed';
-  txHash?: string;
+  txHash: string;
   template: string;
   timestamp: number;
-  contractName?: string;
-  contractCode?: string;
-  constructorArgs?: string;
-  gasUsed?: string;
-  deploymentCost?: string;
+  contractName: string;
+  contractCode: string;
+  constructorArgs: string;
+  gasUsed: string;
+  deploymentCost: string;
 }
 
 export interface SwapTransaction {
@@ -51,19 +51,19 @@ export interface SwapTransaction {
   toToken: string;
   amount: string;
   status: 'pending' | 'confirmed' | 'failed';
-  txHash?: string;
+  txHash: string;
   timestamp: number;
-  slippage?: number;
-  amountOut?: string;
-  gasUsed?: string;
-  priceImpact?: string;
+  slippage: number;
+  amountOut: string;
+  gasUsed: string;
+  priceImpact: string;
 }
 
 export interface GMPost {
   id: string;
   chainId: number;
   status: 'pending' | 'confirmed' | 'failed';
-  txHash?: string;
+  txHash: string;
   timestamp: number;
 }
 
@@ -105,7 +105,7 @@ export interface Notification {
 
 export interface APIResponse<T> {
   success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
+  data: T;
+  error: string;
+  message: string;
 }

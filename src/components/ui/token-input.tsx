@@ -3,15 +3,13 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowUpDown } from 'lucide-react';
 
 interface Token {
   symbol: string;
   name: string;
-  balance?: string;
-  decimals?: number;
-  address?: string;
+  balance: string;
+  decimals: number;
+  address: string;
 }
 
 interface TokenInputProps {
