@@ -30,6 +30,7 @@ export class Web3Service {
       bytecode: template.bytecode as `0x${string}`,
       args: constructorArgs as any,
       chain,
+      account: walletClient.account,
     });
 
     const publicClient = getPublicClient(config, { chainId: chainId as any });
@@ -58,6 +59,7 @@ export class Web3Service {
       bytecode: template.bytecode as `0x${string}`,
       args: [] as any,
       chain,
+      account: walletClient.account,
     });
 
     const publicClient = getPublicClient(config, { chainId: chainId as any });
@@ -72,6 +74,7 @@ export class Web3Service {
       functionName: 'postGM',
       args: [],
       chain,
+      account: walletClient.account,
     });
 
     const receipt = await publicClient?.waitForTransactionReceipt({ hash });

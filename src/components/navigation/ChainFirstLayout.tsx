@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -10,6 +9,7 @@ import ChainSelector from './ChainSelector';
 import ModuleSelector from './ModuleSelector';
 import { useAppStore } from '@/stores/useAppStore';
 import { Search, Command, Bell, Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ChainFirstLayoutProps {
   children: React.ReactNode;
