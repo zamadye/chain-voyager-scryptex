@@ -1,6 +1,96 @@
 
 import { create } from 'zustand';
-import { ChainStatus, WalletState, DeploymentStatus, SwapTransaction, GMPost, AnalyticsOverview, ChainMetrics, QualificationData, Notification } from '@/types';
+
+// Define simple, explicit types for the store
+type WalletState = {
+  address: string | null;
+  isConnected: boolean;
+  chainId: number | null;
+  balance: string;
+};
+
+type ChainStatus = {
+  chainId: number;
+  isActive: boolean;
+  blockHeight: number;
+  gasPrice: string;
+  lastUpdated: number;
+  latency: number;
+};
+
+type DeploymentStatus = {
+  id: string;
+  chainId: number;
+  contractAddress: string;
+  status: 'pending' | 'confirmed' | 'failed';
+  txHash: string;
+  template: string;
+  timestamp: number;
+  contractName: string;
+  contractCode: string;
+  constructorArgs: string;
+  gasUsed: string;
+  deploymentCost: string;
+};
+
+type SwapTransaction = {
+  id: string;
+  chainId: number;
+  fromToken: string;
+  toToken: string;
+  amount: string;
+  status: 'pending' | 'confirmed' | 'failed';
+  txHash: string;
+  timestamp: number;
+  slippage: number;
+  amountOut: string;
+  gasUsed: string;
+  priceImpact: string;
+};
+
+type GMPost = {
+  id: string;
+  chainId: number;
+  status: 'pending' | 'confirmed' | 'failed';
+  txHash: string;
+  timestamp: number;
+};
+
+type AnalyticsOverview = {
+  totalTransactions: number;
+  totalGasSpent: string;
+  chainsActive: number;
+  streakDays: number;
+  qualificationScore: number;
+};
+
+type ChainMetrics = {
+  chainId: number;
+  transactions: number;
+  gasSpent: string;
+  successRate: number;
+  lastActivity: number;
+};
+
+type QualificationData = {
+  chainId: number;
+  score: number;
+  criteria: {
+    transactions: boolean;
+    contracts: boolean;
+    dailyActivity: boolean;
+    volume: boolean;
+  };
+};
+
+type Notification = {
+  id: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message: string;
+  timestamp: number;
+  read: boolean;
+};
 
 interface AppState {
   // Wallet State
