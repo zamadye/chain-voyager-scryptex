@@ -2,6 +2,7 @@
 import { BaseChainModule } from './base-module';
 import { DeployParams, DeployResult, InteractionResult } from '@/types/chain-modules';
 import { getContractTemplate } from '@/lib/contract-templates';
+import { parseEther } from 'viem';
 
 export class ZeroGModule extends BaseChainModule {
   constructor() {
