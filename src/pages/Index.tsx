@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
@@ -21,39 +22,12 @@ const Index = () => {
   
   const { 
     chainStatus, 
-    setChainStatus, 
     wallet, 
     deployments, 
     swaps, 
     gmPosts,
     addNotification 
   } = useAppStore();
-
-  // Load initial data
-  useEffect(() => {
-    const loadChainStatus = async () => {
-      try {
-        const response = await apiService.getChainStatus();
-        if (response.success && response.data) {
-          setChainStatus(response.data);
-        }
-      } catch (error) {
-        console.error('Failed to load chain status:', error);
-        addNotification({
-          type: 'error',
-          title: 'Failed to load chain status',
-          message: 'Using offline data. Some features may be limited.',
-          read: false,
-        });
-      }
-    };
-
-    loadChainStatus();
-    
-    // Poll chain status every 30 seconds
-    const interval = setInterval(loadChainStatus, 30000);
-    return () => clearInterval(interval);
-  }, [setChainStatus, addNotification]);
 
   const handleQuickAction = (action: 'deploy' | 'swap' | 'gm', chainId: number) => {
     if (!isConnected) {
