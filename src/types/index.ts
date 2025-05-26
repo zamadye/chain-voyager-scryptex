@@ -1,18 +1,27 @@
 
+// Basic primitive types
+export type TransactionStatus = 'pending' | 'confirmed' | 'failed';
+export type NotificationType = 'success' | 'error' | 'info' | 'warning';
+
+// Currency interface
+export interface NativeCurrency {
+  name: string;
+  symbol: string;
+  decimals: number;
+}
+
+// Chain configuration
 export interface ChainConfig {
   id: number;
   name: string;
   rpcUrl: string;
   blockExplorer: string;
   faucetUrl: string;
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
+  nativeCurrency: NativeCurrency;
   testnet: boolean;
 }
 
+// Chain status
 export interface ChainStatus {
   chainId: number;
   isActive: boolean;
@@ -22,6 +31,7 @@ export interface ChainStatus {
   latency: number;
 }
 
+// Wallet state
 export interface WalletState {
   address: string | null;
   isConnected: boolean;
@@ -29,8 +39,7 @@ export interface WalletState {
   balance: string;
 }
 
-export type TransactionStatus = 'pending' | 'confirmed' | 'failed';
-
+// Deployment status
 export interface DeploymentStatus {
   id: string;
   chainId: number;
@@ -46,6 +55,7 @@ export interface DeploymentStatus {
   deploymentCost: string;
 }
 
+// Swap transaction
 export interface SwapTransaction {
   id: string;
   chainId: number;
@@ -61,6 +71,7 @@ export interface SwapTransaction {
   priceImpact: string;
 }
 
+// GM post
 export interface GMPost {
   id: string;
   chainId: number;
@@ -69,6 +80,7 @@ export interface GMPost {
   timestamp: number;
 }
 
+// Analytics overview
 export interface AnalyticsOverview {
   totalTransactions: number;
   totalGasSpent: string;
@@ -77,6 +89,7 @@ export interface AnalyticsOverview {
   qualificationScore: number;
 }
 
+// Chain metrics
 export interface ChainMetrics {
   chainId: number;
   transactions: number;
@@ -85,6 +98,7 @@ export interface ChainMetrics {
   lastActivity: number;
 }
 
+// Qualification criteria
 export interface QualificationCriteria {
   transactions: boolean;
   contracts: boolean;
@@ -92,14 +106,14 @@ export interface QualificationCriteria {
   volume: boolean;
 }
 
+// Qualification data
 export interface QualificationData {
   chainId: number;
   score: number;
   criteria: QualificationCriteria;
 }
 
-export type NotificationType = 'success' | 'error' | 'info' | 'warning';
-
+// Notification
 export interface Notification {
   id: string;
   type: NotificationType;
@@ -109,18 +123,10 @@ export interface Notification {
   read: boolean;
 }
 
-// Simplified APIResponse without generic default parameter
+// Simple API response without generics
 export interface APIResponse {
   success: boolean;
-  data?: unknown;
-  error?: string;
-  message?: string;
-}
-
-// Specific typed versions for common use cases
-export interface APIResponseWithData<T> {
-  success: boolean;
-  data: T;
+  data?: any;
   error?: string;
   message?: string;
 }
