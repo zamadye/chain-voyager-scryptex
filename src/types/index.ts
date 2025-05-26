@@ -106,6 +106,6 @@ export interface Notification {
 export interface APIResponse<T> {
   success: boolean;
   data: T;
-  error: string;
-  message: string;
+  error?: string;
+  message?: string;
 }
