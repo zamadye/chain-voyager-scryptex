@@ -49,10 +49,10 @@ const Swap = () => {
       slippage: parseFloat(slippage),
       status: 'pending' as const,
       timestamp: Date.now(),
-      txHash: null,
-      amountOut: null,
-      gasUsed: null,
-      priceImpact: null
+      txHash: '',
+      amountOut: '0',
+      gasUsed: '0',
+      priceImpact: '0'
     };
 
     addSwap(swap);
