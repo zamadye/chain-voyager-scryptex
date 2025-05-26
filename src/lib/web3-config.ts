@@ -52,7 +52,7 @@ export const supportedChains = [
 
 export const config = getDefaultConfig({
   appName: 'SCRYPTEX',
-  projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || 'your-project-id',
+  projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || 'your-project-id',
   chains: supportedChains,
   ssr: false,
 });
