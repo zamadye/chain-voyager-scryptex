@@ -31,7 +31,7 @@ export class Web3Service {
       args: constructorArgs as any,
       chain,
       account: walletClient.account,
-    });
+    } as any);
 
     const publicClient = getPublicClient(config, { chainId: chainId as any });
     const receipt = await publicClient?.waitForTransactionReceipt({ hash });
@@ -60,7 +60,7 @@ export class Web3Service {
       args: [] as any,
       chain,
       account: walletClient.account,
-    });
+    } as any);
 
     const publicClient = getPublicClient(config, { chainId: chainId as any });
     const deployReceipt = await publicClient?.waitForTransactionReceipt({ hash: deployHash });
