@@ -85,11 +85,12 @@ const Deploy = () => {
         template: selectedTemplate,
         status: 'pending' as const,
         timestamp: Date.now(),
-        txHash: null,
-        contractAddress: null,
-        gasUsed: null,
-        deploymentCost: null,
-        constructorArgs: args.join(',')
+        txHash: '',
+        contractAddress: '',
+        gasUsed: '',
+        deploymentCost: '',
+        constructorArgs: args.join(','),
+        contractCode: template.bytecode || ''
       };
 
       addDeployment(deployment);
@@ -106,8 +107,8 @@ const Deploy = () => {
         ...deployment,
         status: 'confirmed',
         txHash: result.txHash,
-        contractAddress: result.contractAddress,
-        gasUsed: result.gasUsed,
+        contractAddress: result.contractAddress || '',
+        gasUsed: result.gasUsed || '',
       });
 
       setDeploymentResult({

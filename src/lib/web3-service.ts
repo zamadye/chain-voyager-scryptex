@@ -1,10 +1,14 @@
 
 import { getPublicClient, getWalletClient } from '@wagmi/core';
 import { parseEther, formatEther } from 'viem';
-import { config } from './web3-config';
+import { config, supportedChains } from './web3-config';
 import { getContractTemplate } from './contract-templates';
 
 export class Web3Service {
+  static getChainById(chainId: number) {
+    return supportedChains.find(chain => chain.id === chainId);
+  }
+
   static async deployContract(
     chainId: number,
     templateName: string,
@@ -14,7 +18,10 @@ export class Web3Service {
     const template = getContractTemplate(templateName);
     if (!template) throw new Error('Template not found');
 
-    const walletClient = await getWalletClient(config, { chainId });
+    const chain = this.getChainById(chainId);
+    if (!chain) throw new Error('Unsupported chain');
+
+    const walletClient = await getWalletClient(config, { chainId: chainId as any });
     if (!walletClient) throw new Error('Wallet not connected');
 
     // Deploy the contract
@@ -22,9 +29,10 @@ export class Web3Service {
       abi: template.abi as any,
       bytecode: template.bytecode as `0x${string}`,
       args: constructorArgs as any,
+      chain,
     });
 
-    const publicClient = getPublicClient(config, { chainId });
+    const publicClient = getPublicClient(config, { chainId: chainId as any });
     const receipt = await publicClient?.waitForTransactionReceipt({ hash });
 
     return {
@@ -38,7 +46,10 @@ export class Web3Service {
     const template = getContractTemplate('GM Contract');
     if (!template) throw new Error('GM template not found');
 
-    const walletClient = await getWalletClient(config, { chainId });
+    const chain = this.getChainById(chainId);
+    if (!chain) throw new Error('Unsupported chain');
+
+    const walletClient = await getWalletClient(config, { chainId: chainId as any });
     if (!walletClient) throw new Error('Wallet not connected');
 
     // First deploy GM contract if needed
@@ -46,9 +57,10 @@ export class Web3Service {
       abi: template.abi as any,
       bytecode: template.bytecode as `0x${string}`,
       args: [] as any,
+      chain,
     });
 
-    const publicClient = getPublicClient(config, { chainId });
+    const publicClient = getPublicClient(config, { chainId: chainId as any });
     const deployReceipt = await publicClient?.waitForTransactionReceipt({ hash: deployHash });
     
     if (!deployReceipt?.contractAddress) throw new Error('Contract deployment failed');
@@ -59,6 +71,7 @@ export class Web3Service {
       abi: template.abi as any,
       functionName: 'postGM',
       args: [],
+      chain,
     });
 
     const receipt = await publicClient?.waitForTransactionReceipt({ hash });
@@ -71,7 +84,7 @@ export class Web3Service {
   }
 
   static async getBalance(address: string, chainId: number) {
-    const publicClient = getPublicClient(config, { chainId });
+    const publicClient = getPublicClient(config, { chainId: chainId as any });
     if (!publicClient) return '0';
 
     const balance = await publicClient.getBalance({ address: address as `0x${string}` });
@@ -79,7 +92,7 @@ export class Web3Service {
   }
 
   static async getGasPrice(chainId: number) {
-    const publicClient = getPublicClient(config, { chainId });
+    const publicClient = getPublicClient(config, { chainId: chainId as any });
     if (!publicClient) return '0';
 
     const gasPrice = await publicClient.getGasPrice();
@@ -87,7 +100,7 @@ export class Web3Service {
   }
 
   static async getBlockNumber(chainId: number) {
-    const publicClient = getPublicClient(config, { chainId });
+    const publicClient = getPublicClient(config, { chainId: chainId as any });
     if (!publicClient) return 0;
 
     const blockNumber = await publicClient.getBlockNumber();
