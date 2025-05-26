@@ -12,6 +12,14 @@ export { MegaETHModule } from './megaeth-module';
 export { SomniaModule } from './somnia-module';
 export { RiseChainModule } from './risechain-module';
 export { AztecModule } from './aztec-module';
+export { FaucetModule } from './faucet-module';
 
 // Export the factory functions
-export { getChainModule, getAllChainModules, isChainSupported, getSupportedChainIds } from './module-factory';
+export { 
+  getChainModule, 
+  getAllChainModules, 
+  isChainSupported, 
+  getSupportedChainIds,
+  getFaucetModule,
+  openChainFaucet
+} from './module-factory';

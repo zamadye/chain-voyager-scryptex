@@ -1,14 +1,16 @@
-
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/stores/useAppStore';
 import { SUPPORTED_CHAINS } from '@/lib/chains';
+import { openChainFaucet } from '@/lib/chain-modules';
 import { Link as ChainIcon, ExternalLink, Zap, Globe, TestTube, Activity } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Chains = () => {
   const { chainStatus } = useAppStore();
+  const { toast } = useToast();
 
   const getStatusColor = (isActive: boolean) => {
     return isActive ? 'text-green-400' : 'text-gray-400';
@@ -20,6 +22,22 @@ const Chains = () => {
     ) : (
       <Badge variant="secondary" className="bg-gray-700 text-gray-400">Inactive</Badge>
     );
+  };
+
+  const handleFaucetClick = (chainId: number, chainName: string) => {
+    const success = openChainFaucet(chainId);
+    if (success) {
+      toast({
+        title: "Faucet Opened",
+        description: `Opening ${chainName} faucet in a new tab`,
+      });
+    } else {
+      toast({
+        title: "Faucet Unavailable",
+        description: `No faucet available for ${chainName}`,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -165,13 +183,11 @@ const Chains = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        asChild
+                        onClick={() => handleFaucetClick(chain.id, chain.name)}
                         className="border-blue-600 hover:border-blue-500 text-blue-400"
                       >
-                        <a href={chain.faucetUrl} target="_blank" rel="noopener noreferrer">
-                          <Zap className="mr-1 h-3 w-3" />
-                          Faucet
-                        </a>
+                        <Zap className="mr-1 h-3 w-3" />
+                        Faucet
                       </Button>
                     )}
 
