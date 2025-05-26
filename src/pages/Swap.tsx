@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import Layout from '@/components/layout/Layout';
+import ChainFirstLayout from '@/components/navigation/ChainFirstLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -76,7 +76,7 @@ const Swap = () => {
   const popularTokens = ['ETH', 'USDC', 'USDT', 'DAI', 'WBTC'];
 
   return (
-    <Layout>
+    <ChainFirstLayout>
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -253,7 +253,7 @@ const Swap = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </ChainFirstLayout>
   );
 };
 
