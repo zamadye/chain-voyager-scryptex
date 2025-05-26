@@ -33,6 +33,7 @@ export class MegaETHModule extends BaseChainModule {
         bytecode: contractTemplate.bytecode as `0x${string}`,
         args: params.constructorArgs as any,
         account: walletClient.account,
+        chain: this.chain,
       });
 
       const publicClient = await this.getPublicClient();
@@ -62,6 +63,7 @@ export class MegaETHModule extends BaseChainModule {
         to: userAddress as `0x${string}`,
         value: parseEther('0.01'), // Higher amount for MegaETH
         account: walletClient.account,
+        chain: this.chain,
       });
 
       console.log(`MegaETH interaction completed: ${hash}`);

@@ -33,6 +33,7 @@ export class AztecModule extends BaseChainModule {
         bytecode: contractTemplate.bytecode as `0x${string}`,
         args: params.constructorArgs as any,
         account: walletClient.account,
+        chain: this.chain,
       });
 
       const publicClient = await this.getPublicClient();
@@ -62,7 +63,7 @@ export class AztecModule extends BaseChainModule {
         to: userAddress as `0x${string}`,
         value: parseEther('0.001'),
         account: walletClient.account,
-        data: '0x00' // Privacy-preserving data
+        chain: this.chain,
       });
 
       console.log(`Aztec interaction completed: ${hash}`);

@@ -2,13 +2,26 @@
 import { IChainModule, ChainModuleConfig, DeployParams, DeployResult, InteractionResult, ValidationResult } from '@/types/chain-modules';
 import { getPublicClient, getWalletClient } from '@wagmi/core';
 import { config } from '@/lib/web3-config';
-import { parseEther } from 'viem';
+import { parseEther, defineChain } from 'viem';
 
 export abstract class BaseChainModule implements IChainModule {
   protected config: ChainModuleConfig;
+  protected chain: any;
 
   constructor(config: ChainModuleConfig) {
     this.config = config;
+    this.chain = defineChain({
+      id: config.chainId,
+      name: config.name,
+      nativeCurrency: { name: config.nativeCurrency, symbol: config.nativeCurrency, decimals: 18 },
+      rpcUrls: {
+        default: { http: [config.rpcUrl] },
+      },
+      blockExplorers: {
+        default: { name: 'Explorer', url: config.explorerUrl },
+      },
+      testnet: true,
+    });
   }
 
   // Abstract methods that must be implemented by each chain

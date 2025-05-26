@@ -123,10 +123,10 @@ export interface Notification {
   read: boolean;
 }
 
-// Simple API response without generics
-export interface APIResponse {
+// Generic API response
+export interface APIResponse<T = any> {
   success: boolean;
-  data?: any;
+  data?: T;
   error?: string;
   message?: string;
 }
