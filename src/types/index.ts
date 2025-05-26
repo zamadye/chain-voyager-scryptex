@@ -29,11 +29,13 @@ export interface WalletState {
   balance: string;
 }
 
+export type TransactionStatus = 'pending' | 'confirmed' | 'failed';
+
 export interface DeploymentStatus {
   id: string;
   chainId: number;
   contractAddress: string;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: TransactionStatus;
   txHash: string;
   template: string;
   timestamp: number;
@@ -50,7 +52,7 @@ export interface SwapTransaction {
   fromToken: string;
   toToken: string;
   amount: string;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: TransactionStatus;
   txHash: string;
   timestamp: number;
   slippage: number;
@@ -62,7 +64,7 @@ export interface SwapTransaction {
 export interface GMPost {
   id: string;
   chainId: number;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: TransactionStatus;
   txHash: string;
   timestamp: number;
 }
@@ -83,29 +85,33 @@ export interface ChainMetrics {
   lastActivity: number;
 }
 
+export interface QualificationCriteria {
+  transactions: boolean;
+  contracts: boolean;
+  dailyActivity: boolean;
+  volume: boolean;
+}
+
 export interface QualificationData {
   chainId: number;
   score: number;
-  criteria: {
-    transactions: boolean;
-    contracts: boolean;
-    dailyActivity: boolean;
-    volume: boolean;
-  };
+  criteria: QualificationCriteria;
 }
+
+export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
 export interface Notification {
   id: string;
-  type: 'success' | 'error' | 'info' | 'warning';
+  type: NotificationType;
   title: string;
   message: string;
   timestamp: number;
   read: boolean;
 }
 
-export interface APIResponse<T> {
+export interface APIResponse<T = any> {
   success: boolean;
-  data: T;
+  data?: T;
   error?: string;
   message?: string;
 }
