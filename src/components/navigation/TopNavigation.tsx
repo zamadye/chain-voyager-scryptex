@@ -27,8 +27,13 @@ import {
 
 const TopNavigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [selectedChain, setSelectedChain] = useState(null);
   const { notifications } = useAppStore();
   const unreadNotifications = notifications.filter(n => !n.read).length;
+
+  const handleChainSelect = (chain) => {
+    setSelectedChain(chain);
+  };
 
   const menuItems = [
     { icon: BarChart3, label: 'STEX Points Dashboard', href: '/points' },
@@ -88,7 +93,10 @@ const TopNavigation = () => {
           <div className="flex items-center space-x-3">
             {/* Chain Selector */}
             <div className="hidden md:block">
-              <ChainSelector />
+              <ChainSelector 
+                onChainSelect={handleChainSelect}
+                selectedChain={selectedChain}
+              />
             </div>
 
             {/* Faucet Button */}

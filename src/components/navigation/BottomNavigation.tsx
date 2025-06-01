@@ -6,7 +6,7 @@ import {
   ArrowUpDown, 
   Plus, 
   Sun, 
-  Bridge 
+  Shuffle 
 } from 'lucide-react';
 
 const BottomNavigation = () => {
@@ -44,7 +44,7 @@ const BottomNavigation = () => {
     {
       id: 'bridge',
       label: 'Bridge',
-      icon: Bridge,
+      icon: Shuffle,
       href: '/bridge',
       active: location.pathname === '/bridge'
     }

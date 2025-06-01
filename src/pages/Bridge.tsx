@@ -5,16 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Bridge as BridgeIcon, ArrowRight, Clock, Shield } from 'lucide-react';
+import { Shuffle, ArrowRight, Clock, Shield } from 'lucide-react';
 import ChainSelector from '@/components/navigation/ChainSelector';
 import TokenSelector from '@/components/trading/TokenSelector';
 import { useState } from 'react';
 
 const Bridge = () => {
   const [amount, setAmount] = useState('');
-  const [fromChain, setFromChain] = useState('');
-  const [toChain, setToChain] = useState('');
+  const [fromChain, setFromChain] = useState(null);
+  const [toChain, setToChain] = useState(null);
   const [selectedToken, setSelectedToken] = useState('ETH');
+
+  const handleFromChainSelect = (chain) => {
+    setFromChain(chain);
+  };
+
+  const handleToChainSelect = (chain) => {
+    setToChain(chain);
+  };
 
   return (
     <DEXLayout>
@@ -23,7 +31,7 @@ const Bridge = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center">
-              <BridgeIcon className="mr-3 h-8 w-8 text-cyan-400" />
+              <Shuffle className="mr-3 h-8 w-8 text-cyan-400" />
               Cross-Chain Bridge
             </h1>
             <p className="text-slate-400 mt-2">Transfer assets securely across multiple blockchains</p>
@@ -39,7 +47,7 @@ const Bridge = () => {
             <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
-                  <BridgeIcon className="mr-2 h-5 w-5 text-cyan-400" />
+                  <Shuffle className="mr-2 h-5 w-5 text-cyan-400" />
                   Bridge Assets
                 </CardTitle>
               </CardHeader>
@@ -49,14 +57,20 @@ const Bridge = () => {
                   <div className="space-y-2">
                     <Label className="text-slate-300">From Chain</Label>
                     <div className="bg-slate-800 rounded-lg p-3">
-                      <ChainSelector />
+                      <ChainSelector 
+                        onChainSelect={handleFromChainSelect}
+                        selectedChain={fromChain}
+                      />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <Label className="text-slate-300">To Chain</Label>
                     <div className="bg-slate-800 rounded-lg p-3">
-                      <ChainSelector />
+                      <ChainSelector 
+                        onChainSelect={handleToChainSelect}
+                        selectedChain={toChain}
+                      />
                     </div>
                   </div>
                 </div>
