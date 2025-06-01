@@ -1,12 +1,14 @@
-
-import { useEffect } from 'react';
-import { useUser } from '@supabase/auth-helpers-react';
+import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 import { useAppStore } from '@/stores/useAppStore';
 import { SupabaseService } from '@/services/supabaseService';
 import { toast } from 'sonner';
 
 export const useSupabaseIntegration = () => {
-  const user = useUser();
+  const { address, isConnected } = useAccount();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  
   const { 
     setUserPoints, 
     setReferralStats, 
@@ -14,134 +16,121 @@ export const useSupabaseIntegration = () => {
     addNotification 
   } = useAppStore();
 
-  // Load user data when authenticated
+  // Check if wallet is authenticated and load user data
   useEffect(() => {
-    if (!user?.id) return;
+    if (!address || !isConnected) {
+      setIsAuthenticated(false);
+      setUserId(null);
+      return;
+    }
 
-    const loadUserData = async () => {
+    const loadWalletData = async () => {
       try {
-        // Load user points
-        const userPoints = await SupabaseService.getUserPoints(user.id);
-        if (userPoints) {
-          setUserPoints({
-            totalPoints: userPoints.total_points || 0,
-            currentStreak: userPoints.current_streak || 0,
-            rank: userPoints.rank || null,
-            gmToday: userPoints.gm_today || false,
-            swapsToday: userPoints.swaps_today || 0,
-            bridgesToday: userPoints.bridges_today || 0,
-            tokensCreatedToday: userPoints.tokens_created_today || 0,
-            recentActivity: []
-          });
+        const profile = await SupabaseService.getProfileByWallet(address);
+        if (profile) {
+          setIsAuthenticated(true);
+          setUserId(profile.id);
+          await loadUserData(profile.id);
         }
-
-        // Load referral stats
-        const referralStats = await SupabaseService.getReferralStats(user.id);
-        if (referralStats) {
-          setReferralStats(referralStats);
-        }
-
-        // Load daily tasks
-        const dailyTasks = await SupabaseService.getDailyTasks(user.id);
-        const formattedTasks = dailyTasks.map(task => ({
-          id: task.id,
-          title: formatTaskTitle(task.task_type),
-          description: formatTaskDescription(task.task_type, task.target_count),
-          reward: task.reward_points,
-          progress: task.current_progress || 0,
-          target: task.target_count,
-          completed: task.completed || false,
-          resetTime: new Date(task.reset_date + 'T23:59:59').getTime()
-        }));
-        setDailyTasks(formattedTasks);
-
-        // Load recent activities
-        const activities = await SupabaseService.getUserActivities(user.id, 10);
-        const formattedActivities = activities.map(activity => ({
-          description: activity.description,
-          points: activity.points_earned || 0,
-          timestamp: formatTimestamp(activity.created_at)
-        }));
-
-        if (userPoints) {
-          setUserPoints({
-            totalPoints: userPoints.total_points || 0,
-            currentStreak: userPoints.current_streak || 0,
-            rank: userPoints.rank || null,
-            gmToday: userPoints.gm_today || false,
-            swapsToday: userPoints.swaps_today || 0,
-            bridgesToday: userPoints.bridges_today || 0,
-            tokensCreatedToday: userPoints.tokens_created_today || 0,
-            recentActivity: formattedActivities
-          });
-        }
-
       } catch (error) {
-        console.error('Error loading user data:', error);
-        toast.error('Failed to load user data');
+        console.error('Error checking wallet authentication:', error);
       }
     };
 
-    loadUserData();
-  }, [user?.id, setUserPoints, setReferralStats, setDailyTasks]);
+    loadWalletData();
+  }, [address, isConnected]);
 
-  // Set up real-time subscriptions
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const pointsSubscription = SupabaseService.subscribeToUserPoints(
-      user.id,
-      (payload) => {
-        const { new: newData } = payload;
-        if (newData) {
-          setUserPoints({
-            totalPoints: newData.total_points || 0,
-            currentStreak: newData.current_streak || 0,
-            rank: newData.rank || null,
-            gmToday: newData.gm_today || false,
-            swapsToday: newData.swaps_today || 0,
-            bridgesToday: newData.bridges_today || 0,
-            tokensCreatedToday: newData.tokens_created_today || 0,
-            recentActivity: []
-          });
-        }
+  const loadUserData = async (profileId: string) => {
+    try {
+      // Load user points
+      const userPoints = await SupabaseService.getUserPoints(profileId);
+      if (userPoints) {
+        setUserPoints({
+          totalPoints: userPoints.total_points || 0,
+          currentStreak: userPoints.current_streak || 0,
+          rank: userPoints.rank || null,
+          gmToday: userPoints.gm_today || false,
+          swapsToday: userPoints.swaps_today || 0,
+          bridgesToday: userPoints.bridges_today || 0,
+          tokensCreatedToday: userPoints.tokens_created_today || 0,
+          recentActivity: []
+        });
       }
-    );
 
-    const activitiesSubscription = SupabaseService.subscribeToUserActivities(
-      user.id,
-      (payload) => {
-        const { new: newActivity } = payload;
-        if (newActivity) {
-          addNotification({
-            type: 'success',
-            title: 'Points Earned!',
-            message: `+${newActivity.points_earned} STEX: ${newActivity.description}`,
-            read: false
-          });
-        }
+      // Load referral stats
+      const referralStats = await SupabaseService.getReferralStats(profileId);
+      if (referralStats) {
+        setReferralStats(referralStats);
       }
-    );
 
-    return () => {
-      pointsSubscription.unsubscribe();
-      activitiesSubscription.unsubscribe();
-    };
-  }, [user?.id, setUserPoints, addNotification]);
+      // Load daily tasks
+      const dailyTasks = await SupabaseService.getDailyTasks(profileId);
+      const formattedTasks = dailyTasks.map(task => ({
+        id: task.id,
+        title: formatTaskTitle(task.task_type),
+        description: formatTaskDescription(task.task_type, task.target_count),
+        reward: task.reward_points,
+        progress: task.current_progress || 0,
+        target: task.target_count,
+        completed: task.completed || false,
+        resetTime: new Date(task.reset_date + 'T23:59:59').getTime()
+      }));
+      setDailyTasks(formattedTasks);
 
-  // Helper functions to award points for various activities
+      // Load recent activities
+      const activities = await SupabaseService.getUserActivities(profileId, 10);
+      const formattedActivities = activities.map(activity => ({
+        description: activity.description,
+        points: activity.points_earned || 0,
+        timestamp: formatTimestamp(activity.created_at)
+      }));
+
+      setUserPoints(prev => prev ? {
+        ...prev,
+        recentActivity: formattedActivities
+      } : null);
+
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      toast.error('Failed to load user data');
+    }
+  };
+
+  const authenticateWallet = async (walletAddress: string, signature: string, message: string) => {
+    try {
+      // Create or get user profile
+      let profile = await SupabaseService.getProfileByWallet(walletAddress);
+      
+      if (!profile) {
+        // Create new profile for wallet
+        profile = await SupabaseService.createWalletProfile(walletAddress);
+      }
+
+      setIsAuthenticated(true);
+      setUserId(profile.id);
+      await loadUserData(profile.id);
+      
+      // Award login points
+      await awardPointsForActivity('login', 'Daily wallet connection', 5);
+      
+    } catch (error) {
+      console.error('Error authenticating wallet:', error);
+      throw error;
+    }
+  };
+
   const awardPointsForActivity = async (
-    activityType: 'gm' | 'swap' | 'bridge' | 'token_creation',
+    activityType: 'gm' | 'swap' | 'bridge' | 'token_creation' | 'login',
     description: string,
     points: number,
     chainId?: number,
     transactionHash?: string
   ) => {
-    if (!user?.id) return;
+    if (!userId) return;
 
     try {
       await SupabaseService.awardPoints(
-        user.id,
+        userId,
         points,
         activityType,
         description,
@@ -149,21 +138,21 @@ export const useSupabaseIntegration = () => {
         transactionHash
       );
       
-      await SupabaseService.updateDailyActivity(user.id, activityType);
+      await SupabaseService.updateDailyActivity(userId, activityType);
       
       toast.success(`+${points} STEX earned!`, {
         description: description
       });
     } catch (error) {
       console.error('Error awarding points:', error);
-      toast.error('Failed to award points');
     }
   };
 
   return {
+    authenticateWallet,
     awardPointsForActivity,
-    isAuthenticated: !!user?.id,
-    userId: user?.id
+    isAuthenticated,
+    userId
   };
 };
 

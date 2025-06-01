@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -36,6 +35,56 @@ export class SupabaseService {
       console.error('Error updating profile:', error);
       throw error;
     }
+    return data;
+  }
+
+  // Wallet Profile Management
+  static async getProfileByWallet(walletAddress: string): Promise<Profile | null> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('wallet_address', walletAddress.toLowerCase())
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching profile by wallet:', error);
+      return null;
+    }
+    return data;
+  }
+
+  static async createWalletProfile(walletAddress: string): Promise<Profile> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert({
+        wallet_address: walletAddress.toLowerCase(),
+        username: `user_${walletAddress.slice(-8)}`
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating wallet profile:', error);
+      throw error;
+    }
+
+    // Create user points record
+    await supabase
+      .from('user_points')
+      .insert({
+        user_id: data.id
+      });
+
+    // Create default daily tasks
+    await supabase
+      .from('daily_tasks')
+      .insert([
+        { user_id: data.id, task_type: 'daily_gm', target_count: 1, reward_points: 10 },
+        { user_id: data.id, task_type: 'swap_3x', target_count: 3, reward_points: 30 },
+        { user_id: data.id, task_type: 'bridge_2x', target_count: 2, reward_points: 50 },
+        { user_id: data.id, task_type: 'create_token', target_count: 1, reward_points: 100 }
+      ]);
+
     return data;
   }
 

@@ -2,8 +2,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
-import { SessionContextProvider } from '@supabase/auth-helpers-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseIntegration } from '@/hooks/useSupabaseIntegration';
 
 // Import all pages
@@ -30,7 +28,7 @@ import './App.css';
 
 const queryClient = new QueryClient();
 
-// App content component to use hooks inside SessionContextProvider
+// App content component to use hooks
 const AppContent = () => {
   const { isAuthenticated } = useSupabaseIntegration();
   
@@ -62,12 +60,10 @@ const AppContent = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionContextProvider supabaseClient={supabase}>
-        <Router>
-          <AppContent />
-          <Toaster />
-        </Router>
-      </SessionContextProvider>
+      <Router>
+        <AppContent />
+        <Toaster />
+      </Router>
     </QueryClientProvider>
   );
 }

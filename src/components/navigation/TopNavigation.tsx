@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Menu, 
-  X, 
   Bell, 
   Settings, 
   Users, 
@@ -13,8 +12,7 @@ import {
   BarChart3,
   HelpCircle,
   FileText,
-  LogIn,
-  User
+  Wallet
 } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import ChainSelector from './ChainSelector';
@@ -26,15 +24,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { AuthModal } from '@/components/auth/AuthModal';
-import { useUser } from '@supabase/auth-helpers-react';
+import { WalletAuthModal } from '@/components/auth/WalletAuthModal';
+import { useSupabaseIntegration } from '@/hooks/useSupabaseIntegration';
+import { useAccount } from 'wagmi';
 
 const TopNavigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedChain, setSelectedChain] = useState(null);
   const { notifications } = useAppStore();
   const unreadNotifications = notifications.filter(n => !n.read).length;
-  const user = useUser();
+  const { isAuthenticated } = useSupabaseIntegration();
+  const { address, isConnected } = useAccount();
 
   const handleChainSelect = (chain) => {
     setSelectedChain(chain);
@@ -126,28 +126,28 @@ const TopNavigation = () => {
 
             {/* Wallet Connection */}
             <div className="flex items-center space-x-4">
-              {!user && (
-                <AuthModal>
+              <ConnectButton />
+              
+              {isConnected && !isAuthenticated && (
+                <WalletAuthModal>
                   <Button 
                     variant="outline" 
-                    className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+                    className="bg-yellow-800 border-yellow-700 text-white hover:bg-yellow-700"
                   >
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Sign In
+                    <Wallet className="h-4 w-4 mr-2" />
+                    Authenticate
                   </Button>
-                </AuthModal>
+                </WalletAuthModal>
               )}
               
-              {user && (
-                <AuthModal>
-                  <Button 
-                    variant="outline" 
-                    className="bg-green-800 border-green-700 text-white hover:bg-green-700"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    {user.email?.split('@')[0] || 'User'}
-                  </Button>
-                </AuthModal>
+              {isAuthenticated && (
+                <Button 
+                  variant="outline" 
+                  className="bg-green-800 border-green-700 text-white hover:bg-green-700"
+                >
+                  <Wallet className="h-4 w-4 mr-2" />
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </Button>
               )}
             </div>
 
