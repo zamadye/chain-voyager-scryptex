@@ -79,6 +79,21 @@ body {
   background: hsl(var(--primary) / 0.5);
 }
 
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure smooth scrolling on touch devices */
+.scrollbar-hide {
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Trading interface specific styles */
 .trading-card {
   background: linear-gradient(135deg, 
