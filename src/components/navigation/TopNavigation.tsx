@@ -14,8 +14,7 @@ import {
   FileText,
   Wallet,
   Activity,
-  ChevronLeft,
-  ChevronRight
+  ChevronDown
 } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAppStore } from '@/stores/useAppStore';
@@ -26,45 +25,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { WalletAuthModal } from '@/components/auth/WalletAuthModal';
 import { useSupabaseIntegration } from '@/hooks/useSupabaseIntegration';
 import { useAccount } from 'wagmi';
 import { getAllChains } from '@/lib/chains';
 import { ChainConfig } from '@/types';
-import { cn } from '@/lib/utils';
-import { useRef } from 'react';
 
 const TopNavigation = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedChain, setSelectedChain] = useState<ChainConfig | null>(null);
   const { notifications } = useAppStore();
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const { isAuthenticated } = useSupabaseIntegration();
   const { address, isConnected } = useAccount();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showLeftButton, setShowLeftButton] = useState(false);
-  const [showRightButton, setShowRightButton] = useState(true);
 
   const chains = getAllChains();
 
-  const handleChainSelect = (chain: ChainConfig) => {
-    setSelectedChain(chain);
-  };
-
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setShowLeftButton(scrollLeft > 0);
-    setShowRightButton(scrollLeft < scrollWidth - clientWidth - 10);
-  };
-
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
-  };
-
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
+  const handleChainSelect = (chainId: string) => {
+    const chain = chains.find(c => c.id.toString() === chainId);
+    setSelectedChain(chain || null);
   };
 
   const menuItems = [
@@ -78,7 +63,7 @@ const TopNavigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-950/95 via-slate-900/95 to-slate-950/95 backdrop-blur-sm border-b border-slate-800">
-      <div className="container mx-auto px-2 sm:px-4">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
@@ -121,53 +106,33 @@ const TopNavigation = () => {
             </Link>
           </nav>
 
-          {/* Chain Selector - Horizontal Scroll */}
-          <div className="hidden md:flex items-center space-x-2 flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              {showLeftButton && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-6 w-6 bg-gray-900/80 hover:bg-gray-800"
-                  onClick={scrollLeft}
-                >
-                  <ChevronLeft className="h-3 w-3" />
-                </Button>
-              )}
-              
-              <div
-                ref={scrollRef}
-                className="flex overflow-x-auto gap-2 pb-1 scroll-smooth scrollbar-hide px-6"
-                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
-                onScroll={handleScroll}
-              >
-                {chains.slice(0, 8).map((chain) => (
-                  <button
-                    key={chain.id}
-                    className={cn(
-                      "min-w-[80px] h-8 px-3 rounded-md transition-all duration-200 flex items-center justify-center space-x-1",
-                      "bg-gray-800/50 border border-gray-700 hover:border-blue-500/50 scroll-snap-align-start",
-                      selectedChain?.id === chain.id && "border-blue-500 bg-blue-500/10"
-                    )}
-                    onClick={() => handleChainSelect(chain)}
+          {/* Chain Selector - Dropdown */}
+          <div className="hidden md:flex items-center space-x-2 flex-1 max-w-xs mx-4">
+            <Select value={selectedChain?.id.toString() || ""} onValueChange={handleChainSelect}>
+              <SelectTrigger className="w-full bg-slate-800/50 border-slate-700 text-white">
+                <div className="flex items-center space-x-2">
+                  <Activity className="h-4 w-4 text-blue-400" />
+                  <SelectValue placeholder="Select Chain" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-slate-800 max-h-60">
+                {chains.map((chain) => (
+                  <SelectItem 
+                    key={chain.id} 
+                    value={chain.id.toString()}
+                    className="text-white hover:bg-slate-800 focus:bg-slate-800"
                   >
-                    <Activity className="h-3 w-3 text-blue-400" />
-                    <span className="text-xs text-white font-medium truncate">{chain.name}</span>
-                  </button>
+                    <div className="flex items-center space-x-2">
+                      <Activity className="h-3 w-3 text-blue-400" />
+                      <span>{chain.name}</span>
+                      {chain.testnet && (
+                        <Badge variant="secondary" className="text-xs ml-2">Test</Badge>
+                      )}
+                    </div>
+                  </SelectItem>
                 ))}
-              </div>
-              
-              {showRightButton && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-6 w-6 bg-gray-900/80 hover:bg-gray-800"
-                  onClick={scrollRight}
-                >
-                  <ChevronRight className="h-3 w-3" />
-                </Button>
-              )}
-            </div>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Right Actions */}
