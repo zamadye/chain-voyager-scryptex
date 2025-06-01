@@ -1,259 +1,139 @@
 
-import { useState } from 'react';
-import ChainFirstLayout from '@/components/navigation/ChainFirstLayout';
-import { Button } from '@/components/ui/button';
+import DEXLayout from '@/components/layout/DEXLayout';
+import SwapInterface from '@/components/trading/SwapInterface';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { useAppStore } from '@/stores/useAppStore';
-import { SUPPORTED_CHAINS } from '@/lib/chains';
-import { ArrowLeftRight, ArrowUpDown, Zap, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowUpDown, TrendingUp, Clock, BarChart3 } from 'lucide-react';
 
 const Swap = () => {
-  const { wallet, addSwap, addNotification } = useAppStore();
-  const [selectedChain, setSelectedChain] = useState('');
-  const [fromToken, setFromToken] = useState('');
-  const [toToken, setToToken] = useState('');
-  const [amount, setAmount] = useState('');
-  const [slippage, setSlippage] = useState('0.5');
+  const recentTrades = [
+    { pair: 'ETH/USDC', amount: '2.5 ETH', price: '$2,450', time: '2m ago', type: 'buy' },
+    { pair: 'STEX/ETH', amount: '1,000 STEX', price: '0.001 ETH', time: '5m ago', type: 'sell' },
+    { pair: 'USDC/USDT', amount: '500 USDC', price: '$1.00', time: '8m ago', type: 'buy' },
+    { pair: 'ETH/DAI', amount: '1.2 ETH', price: '$2,445', time: '12m ago', type: 'sell' }
+  ];
 
-  const handleSwap = () => {
-    if (!wallet.isConnected) {
-      addNotification({
-        type: 'warning',
-        title: 'Wallet not connected',
-        message: 'Please connect your wallet to perform swaps.',
-        read: false
-      });
-      return;
-    }
-
-    if (!selectedChain || !fromToken || !toToken || !amount) {
-      addNotification({
-        type: 'error',
-        title: 'Missing information',
-        message: 'Please fill in all required fields.',
-        read: false
-      });
-      return;
-    }
-
-    const swap = {
-      id: `swap-${Date.now()}`,
-      chainId: parseInt(selectedChain),
-      fromToken,
-      toToken,
-      amount: amount,
-      slippage: parseFloat(slippage),
-      status: 'pending' as const,
-      timestamp: Date.now(),
-      txHash: '',
-      amountOut: '0',
-      gasUsed: '0',
-      priceImpact: '0'
-    };
-
-    addSwap(swap);
-    addNotification({
-      type: 'success',
-      title: 'Swap initiated',
-      message: `Swapping ${amount} ${fromToken} to ${toToken} on ${SUPPORTED_CHAINS[Object.keys(SUPPORTED_CHAINS).find(k => SUPPORTED_CHAINS[k].id === parseInt(selectedChain))]?.name}.`,
-      read: false
-    });
-
-    // Reset form
-    setAmount('');
-  };
-
-  const swapTokens = () => {
-    const temp = fromToken;
-    setFromToken(toToken);
-    setToToken(temp);
-  };
-
-  const popularTokens = ['ETH', 'USDC', 'USDT', 'DAI', 'WBTC'];
+  const tradingPairs = [
+    { pair: 'ETH/USDC', price: '$2,450.25', change: '+2.5%', volume: '$1.2M', trend: 'up' },
+    { pair: 'STEX/ETH', price: '0.001055', change: '+12.8%', volume: '$145K', trend: 'up' },
+    { pair: 'USDC/USDT', price: '$1.0002', change: '+0.02%', volume: '$890K', trend: 'up' },
+    { pair: 'ETH/DAI', price: '$2,447.10', change: '-0.8%', volume: '$567K', trend: 'down' }
+  ];
 
   return (
-    <ChainFirstLayout>
-      <div className="space-y-8">
+    <DEXLayout>
+      <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center">
-              <ArrowLeftRight className="mr-3 h-8 w-8 text-blue-400" />
-              Token Swap
+              <ArrowUpDown className="mr-3 h-8 w-8 text-emerald-400" />
+              Trading Hub
             </h1>
-            <p className="text-gray-400 mt-2">Swap tokens across multiple chains with best rates</p>
+            <p className="text-slate-400 mt-2">Trade tokens with the best rates across multiple chains</p>
           </div>
-          <Badge variant="outline" className="border-blue-500/50 text-blue-400">
-            Cross-Chain DEX
-          </Badge>
+          <div className="flex items-center space-x-2">
+            <Badge variant="outline" className="border-emerald-500/50 text-emerald-400">
+              Live Trading
+            </Badge>
+            <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">
+              Best Rates
+            </Badge>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Swap Interface */}
-          <div className="lg:col-span-2">
-            <Card className="bg-gray-900/50 border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center justify-between">
-                  <span className="flex items-center">
-                    <Zap className="mr-2 h-5 w-5" />
-                    Swap Tokens
-                  </span>
-                  <Badge variant="secondary">Best Rate</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="chain" className="text-white">Chain</Label>
-                  <Select value={selectedChain} onValueChange={setSelectedChain}>
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                      <SelectValue placeholder="Select chain" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
-                      {Object.entries(SUPPORTED_CHAINS).map(([key, chain]) => (
-                        <SelectItem key={key} value={chain.id.toString()}>
-                          {chain.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* From Token */}
-                <div className="space-y-2">
-                  <Label className="text-white">From</Label>
-                  <Card className="bg-gray-800/50 border-gray-700 p-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <Input
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder="0.0"
-                          className="bg-transparent border-0 text-2xl font-bold text-white p-0 h-auto focus-visible:ring-0"
-                        />
-                        <p className="text-gray-400 text-sm mt-1">≈ $0.00</p>
-                      </div>
-                      <div className="ml-4">
-                        <Select value={fromToken} onValueChange={setFromToken}>
-                          <SelectTrigger className="bg-gray-700 border-gray-600 text-white min-w-[100px]">
-                            <SelectValue placeholder="Token" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-700">
-                            {popularTokens.map((token) => (
-                              <SelectItem key={token} value={token}>
-                                {token}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-
-                {/* Swap Button */}
-                <div className="flex justify-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={swapTokens}
-                    className="rounded-full h-10 w-10 p-0 hover:bg-gray-700"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* To Token */}
-                <div className="space-y-2">
-                  <Label className="text-white">To</Label>
-                  <Card className="bg-gray-800/50 border-gray-700 p-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <div className="text-2xl font-bold text-white">0.0</div>
-                        <p className="text-gray-400 text-sm mt-1">≈ $0.00</p>
-                      </div>
-                      <div className="ml-4">
-                        <Select value={toToken} onValueChange={setToToken}>
-                          <SelectTrigger className="bg-gray-700 border-gray-600 text-white min-w-[100px]">
-                            <SelectValue placeholder="Token" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-700">
-                            {popularTokens.map((token) => (
-                              <SelectItem key={token} value={token}>
-                                {token}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-
-                {/* Slippage Settings */}
-                <div className="space-y-2">
-                  <Label htmlFor="slippage" className="text-white">Slippage Tolerance (%)</Label>
-                  <Select value={slippage} onValueChange={setSlippage}>
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
-                      <SelectItem value="0.1">0.1%</SelectItem>
-                      <SelectItem value="0.5">0.5%</SelectItem>
-                      <SelectItem value="1.0">1.0%</SelectItem>
-                      <SelectItem value="3.0">3.0%</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  onClick={handleSwap}
-                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700"
-                  disabled={!wallet.isConnected}
-                >
-                  Swap Tokens
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="lg:col-span-1">
+            <SwapInterface />
           </div>
 
-          {/* Market Info */}
-          <div className="lg:col-span-1 space-y-4">
-            <Card className="bg-gray-900/50 border-gray-800">
+          {/* Trading Data */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Trading Pairs */}
+            <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <TrendingUp className="mr-2 h-5 w-5" />
-                  Market Info
+                <CardTitle className="text-white flex items-center justify-between">
+                  <div className="flex items-center">
+                    <BarChart3 className="mr-2 h-5 w-5 text-emerald-400" />
+                    Active Trading Pairs
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-slate-400">
+                    View All
+                  </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Rate</span>
-                    <span className="text-white">1 ETH = 2,450 USDC</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Price Impact</span>
-                    <span className="text-green-400">0.01%</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Minimum Received</span>
-                    <span className="text-white">2,437.75 USDC</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Network Fee</span>
-                    <span className="text-white">~$12.50</span>
-                  </div>
+              <CardContent>
+                <div className="space-y-3">
+                  {tradingPairs.map((pair, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors cursor-pointer">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          {pair.pair.split('/')[0][0]}
+                        </div>
+                        <div>
+                          <div className="text-white font-semibold">{pair.pair}</div>
+                          <div className="text-slate-400 text-sm">Vol: {pair.volume}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-white font-semibold">{pair.price}</div>
+                        <Badge 
+                          variant={pair.trend === 'up' ? 'default' : 'destructive'}
+                          className={
+                            pair.trend === 'up' 
+                              ? 'bg-emerald-500/20 text-emerald-400' 
+                              : 'bg-red-500/20 text-red-400'
+                          }
+                        >
+                          {pair.change}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Trades */}
+            <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Clock className="mr-2 h-5 w-5 text-emerald-400" />
+                  Recent Trades
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {recentTrades.map((trade, index) => (
+                    <div key={index} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center space-x-3">
+                        <div className={`px-2 py-1 rounded text-xs font-semibold ${
+                          trade.type === 'buy' 
+                            ? 'bg-emerald-500/20 text-emerald-400' 
+                            : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {trade.type.toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">{trade.pair}</div>
+                          <div className="text-slate-400">{trade.amount}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-white">{trade.price}</div>
+                        <div className="text-slate-400">{trade.time}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </ChainFirstLayout>
+    </DEXLayout>
   );
 };
 

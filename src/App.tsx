@@ -1,3 +1,4 @@
+
 import '@rainbow-me/rainbowkit/styles.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +16,8 @@ import Analytics from "./pages/Analytics";
 import Chains from "./pages/Chains";
 import Profile from "./pages/Profile";
 import HistoryPage from "./pages/History";
+import Create from "./pages/Create";
+import Bridge from "./pages/Bridge";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,9 +32,11 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/deploy" element={<Deploy />} />
               <Route path="/swap" element={<Swap />} />
+              <Route path="/create" element={<Create />} />
+              <Route path="/bridge" element={<Bridge />} />
               <Route path="/gm" element={<GM />} />
+              <Route path="/deploy" element={<Deploy />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/chains" element={<Chains />} />
               <Route path="/profile" element={<Profile />} />
