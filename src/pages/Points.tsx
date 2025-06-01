@@ -3,70 +3,20 @@ import DEXLayout from '@/components/layout/DEXLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
   Trophy, 
-  Target, 
-  Gift, 
   TrendingUp, 
-  Calendar,
-  ArrowUpDown,
-  Shuffle,
-  Plus,
-  Sun,
   Users,
-  CheckCircle2
+  Gift,
+  Target,
+  Calendar,
+  Activity
 } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
+import { Link } from 'react-router-dom';
 
 const Points = () => {
-  const { userPoints, dailyTasks, referralStats } = useAppStore();
-
-  const tasks = [
-    {
-      id: 'daily_gm',
-      title: 'Daily GM Ritual',
-      description: 'Post GM on any chain',
-      reward: 10,
-      progress: userPoints?.gmToday ? 1 : 0,
-      target: 1,
-      icon: Sun,
-      completed: userPoints?.gmToday || false
-    },
-    {
-      id: 'swap_3x',
-      title: 'Make 3 Swaps',
-      description: 'Complete 3 token swaps today',
-      reward: 30,
-      progress: userPoints?.swapsToday || 0,
-      target: 3,
-      icon: ArrowUpDown,
-      completed: (userPoints?.swapsToday || 0) >= 3
-    },
-    {
-      id: 'bridge_2x',
-      title: 'Bridge 2 Times',
-      description: 'Complete 2 bridge transactions',
-      reward: 50,
-      progress: userPoints?.bridgesToday || 0,
-      target: 2,
-      icon: Shuffle,
-      completed: (userPoints?.bridgesToday || 0) >= 2
-    },
-    {
-      id: 'create_token',
-      title: 'Create Token',
-      description: 'Deploy a new token',
-      reward: 100,
-      progress: userPoints?.tokensCreatedToday || 0,
-      target: 1,
-      icon: Plus,
-      completed: (userPoints?.tokensCreatedToday || 0) >= 1
-    }
-  ];
-
-  const totalPossibleToday = tasks.reduce((sum, task) => sum + task.reward, 0);
-  const earnedToday = tasks.filter(task => task.completed).reduce((sum, task) => sum + task.reward, 0);
+  const { userPoints, referralStats } = useAppStore();
 
   return (
     <DEXLayout>
@@ -78,7 +28,7 @@ const Points = () => {
               <Trophy className="mr-3 h-8 w-8 text-yellow-400" />
               STEX Points Dashboard
             </h1>
-            <p className="text-slate-400 mt-2">Earn points by completing daily tasks and activities</p>
+            <p className="text-slate-400 mt-2">Track your points, activity, and rewards</p>
           </div>
           <Badge variant="outline" className="border-yellow-500/50 text-yellow-400 text-lg px-4 py-2">
             {userPoints?.totalPoints || 0} STEX
@@ -86,80 +36,127 @@ const Points = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Daily Tasks */}
-          <div className="lg:col-span-2 space-y-4">
+          {/* Points Overview */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Point Values */}
             <Card className="bg-slate-900/50 border-slate-800">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Target className="mr-2 h-5 w-5 text-cyan-400" />
-                  Daily Tasks
-                  <Badge className="ml-auto bg-cyan-500/20 text-cyan-400">
-                    {earnedToday}/{totalPossibleToday} STEX
-                  </Badge>
+                  Point Values & Earning Opportunities
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {tasks.map((task) => {
-                  const Icon = task.icon;
-                  const progressPercent = (task.progress / task.target) * 100;
-                  
-                  return (
-                    <div key={task.id} className="bg-slate-800/50 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-white text-lg">Daily Activities</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
                         <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${task.completed ? 'bg-green-500/20' : 'bg-slate-700'}`}>
-                            <Icon className={`h-4 w-4 ${task.completed ? 'text-green-400' : 'text-slate-400'}`} />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-white">{task.title}</h3>
-                            <p className="text-sm text-slate-400">{task.description}</p>
-                          </div>
+                          <div className="h-2 w-2 bg-yellow-400 rounded-full"></div>
+                          <span className="text-slate-300">Daily GM Ritual</span>
                         </div>
-                        <div className="text-right">
-                          <Badge variant={task.completed ? "default" : "outline"} 
-                                 className={task.completed ? "bg-green-500/20 text-green-400" : ""}>
-                            +{task.reward} STEX
-                          </Badge>
-                          {task.completed && (
-                            <CheckCircle2 className="h-5 w-5 text-green-400 mt-1 ml-auto" />
-                          )}
-                        </div>
+                        <Badge className="bg-yellow-500/20 text-yellow-400">+10 STEX</Badge>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm text-slate-400">
-                          <span>Progress: {task.progress}/{task.target}</span>
-                          <span>{Math.round(progressPercent)}%</span>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-emerald-400 rounded-full"></div>
+                          <span className="text-slate-300">Token Swap</span>
                         </div>
-                        <Progress value={progressPercent} className="h-2" />
+                        <Badge className="bg-emerald-500/20 text-emerald-400">+5 STEX each</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-blue-400 rounded-full"></div>
+                          <span className="text-slate-300">Cross-chain Bridge</span>
+                        </div>
+                        <Badge className="bg-blue-500/20 text-blue-400">+15 STEX each</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-purple-400 rounded-full"></div>
+                          <span className="text-slate-300">Create Token</span>
+                        </div>
+                        <Badge className="bg-purple-500/20 text-purple-400">+100 STEX</Badge>
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-white text-lg">Bonus Rewards</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                          <span className="text-slate-300">Complete 3 Swaps Daily</span>
+                        </div>
+                        <Badge className="bg-green-500/20 text-green-400">+30 STEX</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-cyan-400 rounded-full"></div>
+                          <span className="text-slate-300">Complete 2 Bridges Daily</span>
+                        </div>
+                        <Badge className="bg-cyan-500/20 text-cyan-400">+50 STEX</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-pink-400 rounded-full"></div>
+                          <span className="text-slate-300">Referral Program</span>
+                        </div>
+                        <Badge className="bg-pink-500/20 text-pink-400">+50 STEX</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-2 w-2 bg-orange-400 rounded-full"></div>
+                          <span className="text-slate-300">Streak Multiplier</span>
+                        </div>
+                        <Badge className="bg-orange-500/20 text-orange-400">Up to 2x</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-700">
+                  <Link to="/earn-stex">
+                    <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700">
+                      <Target className="h-4 w-4 mr-2" />
+                      Start Earning Points
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Points History */}
+            {/* Transaction History */}
             <Card className="bg-slate-900/50 border-slate-800">
               <CardHeader>
-                <CardTitle className="text-white">Recent Points Activity</CardTitle>
+                <CardTitle className="text-white flex items-center">
+                  <Activity className="mr-2 h-5 w-5 text-emerald-400" />
+                  Recent Points Activity
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {userPoints?.recentActivity?.map((activity, index) => (
-                    <div key={index} className="flex items-center justify-between py-2 border-b border-slate-700 last:border-0">
+                    <div key={index} className="flex items-center justify-between py-3 border-b border-slate-700 last:border-0">
                       <div className="flex items-center space-x-3">
-                        <div className="h-2 w-2 bg-green-400 rounded-full" />
-                        <span className="text-slate-300">{activity.description}</span>
+                        <div className="h-3 w-3 bg-green-400 rounded-full" />
+                        <div>
+                          <span className="text-slate-300 font-medium">{activity.description}</span>
+                          <div className="text-xs text-slate-500">{activity.timestamp}</div>
+                        </div>
                       </div>
                       <div className="text-right">
-                        <span className="text-green-400 font-semibold">+{activity.points} STEX</span>
-                        <div className="text-xs text-slate-500">{activity.timestamp}</div>
+                        <span className="text-green-400 font-bold text-lg">+{activity.points}</span>
+                        <div className="text-xs text-slate-400">STEX</div>
                       </div>
                     </div>
                   )) || (
                     <div className="text-center text-slate-400 py-8">
-                      No recent activity. Complete tasks to start earning!
+                      <Activity className="h-12 w-12 mx-auto mb-3 text-slate-600" />
+                      <p>No recent activity</p>
+                      <p className="text-sm">Complete tasks to start earning points!</p>
                     </div>
                   )}
                 </div>
@@ -220,12 +217,14 @@ const Points = () => {
                   <div className="text-xs text-slate-400">STEX from Referrals</div>
                 </div>
 
-                <Button 
-                  variant="outline" 
-                  className="w-full border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
-                >
-                  View Referral Program
-                </Button>
+                <Link to="/referrals">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+                  >
+                    View Referral Program
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -233,7 +232,7 @@ const Points = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Gift className="mr-2 h-5 w-5 text-green-400" />
-                  Multipliers
+                  Active Multipliers
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -242,8 +241,12 @@ const Points = () => {
                   <span className="text-green-400">x{1 + (userPoints?.currentStreak || 0) * 0.1}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Referral Bonus</span>
+                  <span className="text-slate-400">Daily Tasks</span>
                   <span className="text-green-400">x1.2</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Referral Bonus</span>
+                  <span className="text-green-400">x1.1</span>
                 </div>
               </CardContent>
             </Card>

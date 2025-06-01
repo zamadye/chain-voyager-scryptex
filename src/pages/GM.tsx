@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
-import Layout from '@/components/layout/Layout';
+import DEXLayout from '@/components/layout/DEXLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -122,7 +121,7 @@ const GM = () => {
   };
 
   return (
-    <Layout>
+    <DEXLayout>
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -269,7 +268,7 @@ const GM = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </DEXLayout>
   );
 };
 

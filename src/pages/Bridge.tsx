@@ -5,24 +5,26 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shuffle, ArrowRight, Clock, Shield } from 'lucide-react';
-import ChainSelector from '@/components/navigation/ChainSelector';
 import TokenSelector from '@/components/trading/TokenSelector';
 import { useState } from 'react';
 
 const Bridge = () => {
   const [amount, setAmount] = useState('');
-  const [fromChain, setFromChain] = useState(null);
-  const [toChain, setToChain] = useState(null);
+  const [fromChain, setFromChain] = useState('');
+  const [toChain, setToChain] = useState('');
   const [selectedToken, setSelectedToken] = useState('ETH');
 
-  const handleFromChainSelect = (chain) => {
-    setFromChain(chain);
-  };
-
-  const handleToChainSelect = (chain) => {
-    setToChain(chain);
-  };
+  const supportedChains = [
+    { id: '1', name: 'Ethereum', icon: '🔗' },
+    { id: '56', name: 'Nexus', icon: '⚡' },
+    { id: '137', name: '0G Network', icon: '🚀' },
+    { id: '250', name: 'Somnia', icon: '🌟' },
+    { id: '43114', name: 'Aztec', icon: '🔮' },
+    { id: '42161', name: 'RiseChain', icon: '📈' },
+    { id: '10', name: 'MegaETH', icon: '⚡' },
+  ];
 
   return (
     <DEXLayout>
@@ -56,22 +58,50 @@ const Bridge = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-slate-300">From Chain</Label>
-                    <div className="bg-slate-800 rounded-lg p-3">
-                      <ChainSelector 
-                        onChainSelect={handleFromChainSelect}
-                        selectedChain={fromChain}
-                      />
-                    </div>
+                    <Select value={fromChain} onValueChange={setFromChain}>
+                      <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                        <SelectValue placeholder="Select source chain" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        {supportedChains.map((chain) => (
+                          <SelectItem 
+                            key={chain.id} 
+                            value={chain.id}
+                            className="text-white hover:bg-slate-700 focus:bg-slate-700"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <span>{chain.icon}</span>
+                              <span>{chain.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   
                   <div className="space-y-2">
                     <Label className="text-slate-300">To Chain</Label>
-                    <div className="bg-slate-800 rounded-lg p-3">
-                      <ChainSelector 
-                        onChainSelect={handleToChainSelect}
-                        selectedChain={toChain}
-                      />
-                    </div>
+                    <Select value={toChain} onValueChange={setToChain}>
+                      <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                        <SelectValue placeholder="Select destination chain" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        {supportedChains
+                          .filter(chain => chain.id !== fromChain)
+                          .map((chain) => (
+                          <SelectItem 
+                            key={chain.id} 
+                            value={chain.id}
+                            className="text-white hover:bg-slate-700 focus:bg-slate-700"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <span>{chain.icon}</span>
+                              <span>{chain.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -149,7 +179,7 @@ const Bridge = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Shield className="mr-2 h-5 w-5 text-green-400" />
-                  Security
+                  Security Features
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
@@ -165,23 +195,40 @@ const Bridge = () => {
                   <div className="h-2 w-2 bg-green-400 rounded-full mr-2" />
                   Decentralized Validators
                 </div>
+                <div className="flex items-center text-green-400">
+                  <div className="h-2 w-2 bg-green-400 rounded-full mr-2" />
+                  24/7 Monitoring
+                </div>
               </CardContent>
             </Card>
 
             <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white">Supported Chains</CardTitle>
+                <CardTitle className="text-white">Supported Networks</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {[
-                  'Ethereum', 'Nexus', '0G', 'Somnia', 
-                  'Aztec', 'RiseChain', 'MegaETH'
-                ].map((chain) => (
-                  <div key={chain} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-300">{chain}</span>
+                {supportedChains.map((chain) => (
+                  <div key={chain.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span>{chain.icon}</span>
+                      <span className="text-slate-300">{chain.name}</span>
+                    </div>
                     <div className="h-2 w-2 bg-green-500 rounded-full" />
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white">Recent Bridges</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center text-slate-400 py-4">
+                  <Shuffle className="h-8 w-8 mx-auto mb-2 text-slate-600" />
+                  <p className="text-sm">No recent bridges</p>
+                  <p className="text-xs">Your bridge history will appear here</p>
+                </div>
               </CardContent>
             </Card>
           </div>

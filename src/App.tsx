@@ -19,6 +19,7 @@ import HistoryPage from "./pages/History";
 import Create from "./pages/Create";
 import Bridge from "./pages/Bridge";
 import Points from "./pages/Points";
+import EarnSTEX from "./pages/EarnSTEX";
 import Referrals from "./pages/Referrals";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/points" element={<Points />} />
+              <Route path="/earn-stex" element={<EarnSTEX />} />
               <Route path="/referrals" element={<Referrals />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/support" element={<Support />} />
