@@ -2,6 +2,7 @@
 import { ReactNode } from 'react';
 import TopNavigation from '@/components/navigation/TopNavigation';
 import BottomNavigation from '@/components/navigation/BottomNavigation';
+import FloatingAIAnalyzer from '@/components/ai/FloatingAIAnalyzer';
 
 interface DEXLayoutProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ const DEXLayout = ({ children }: DEXLayoutProps) => {
       </main>
 
       <BottomNavigation />
+      <FloatingAIAnalyzer />
     </div>
   );
 };
