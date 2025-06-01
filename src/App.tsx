@@ -1,66 +1,75 @@
 
-import '@rainbow-me/rainbowkit/styles.css';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider } from 'wagmi';
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { config } from './lib/web3-config';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Deploy from "./pages/Deploy";
-import Swap from "./pages/Swap";
-import GM from "./pages/GM";
-import Analytics from "./pages/Analytics";
-import Chains from "./pages/Chains";
-import Profile from "./pages/Profile";
-import HistoryPage from "./pages/History";
-import Create from "./pages/Create";
-import Bridge from "./pages/Bridge";
-import Points from "./pages/Points";
-import EarnSTEX from "./pages/EarnSTEX";
-import Referrals from "./pages/Referrals";
-import Settings from "./pages/Settings";
-import Support from "./pages/Support";
-import Documentation from "./pages/Documentation";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/sonner';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseIntegration } from '@/hooks/useSupabaseIntegration';
+
+// Import all pages
+import Index from '@/pages/Index';
+import Swap from '@/pages/Swap';
+import Bridge from '@/pages/Bridge';
+import Create from '@/pages/Create';
+import Deploy from '@/pages/Deploy';
+import Analytics from '@/pages/Analytics';
+import Points from '@/pages/Points';
+import Referrals from '@/pages/Referrals';
+import EarnSTEX from '@/pages/EarnSTEX';
+import GM from '@/pages/GM';
+import History from '@/pages/History';
+import Profile from '@/pages/Profile';
+import Settings from '@/pages/Settings';
+import Support from '@/pages/Support';
+import Documentation from '@/pages/Documentation';
+import Chains from '@/pages/Chains';
+import NotFound from '@/pages/NotFound';
+
+import DEXLayout from '@/components/layout/DEXLayout';
+import './App.css';
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <WagmiProvider config={config}>
+// App content component to use hooks inside SessionContextProvider
+const AppContent = () => {
+  const { isAuthenticated } = useSupabaseIntegration();
+  
+  return (
+    <DEXLayout>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/swap" element={<Swap />} />
+        <Route path="/bridge" element={<Bridge />} />
+        <Route path="/create" element={<Create />} />
+        <Route path="/deploy" element={<Deploy />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/points" element={<Points />} />
+        <Route path="/referrals" element={<Referrals />} />
+        <Route path="/earn" element={<EarnSTEX />} />
+        <Route path="/gm" element={<GM />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/docs" element={<Documentation />} />
+        <Route path="/chains" element={<Chains />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </DEXLayout>
+  );
+};
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider>
-        <TooltipProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <Router>
+          <AppContent />
           <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/swap" element={<Swap />} />
-              <Route path="/create" element={<Create />} />
-              <Route path="/bridge" element={<Bridge />} />
-              <Route path="/gm" element={<GM />} />
-              <Route path="/deploy" element={<Deploy />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/chains" element={<Chains />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/history" element={<HistoryPage />} />
-              <Route path="/points" element={<Points />} />
-              <Route path="/earn-stex" element={<EarnSTEX />} />
-              <Route path="/referrals" element={<Referrals />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/docs" element={<Documentation />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </RainbowKitProvider>
+        </Router>
+      </SessionContextProvider>
     </QueryClientProvider>
-  </WagmiProvider>
-);
+  );
+}
 
 export default App;

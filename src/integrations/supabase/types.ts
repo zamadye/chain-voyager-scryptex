@@ -9,13 +9,242 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      daily_tasks: {
+        Row: {
+          completed: boolean | null
+          created_at: string | null
+          current_progress: number | null
+          id: string
+          reset_date: string | null
+          reward_points: number
+          target_count: number
+          task_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          reset_date?: string | null
+          reward_points: number
+          target_count: number
+          task_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          reset_date?: string | null
+          reward_points?: number
+          target_count?: number
+          task_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_tasks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          points_earned: number | null
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points_earned?: number | null
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points_earned?: number | null
+          referral_code?: string
+          referred_id?: string
+          referrer_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_activities: {
+        Row: {
+          activity_type: string
+          chain_id: number | null
+          created_at: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          points_earned: number | null
+          transaction_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          chain_id?: number | null
+          created_at?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          points_earned?: number | null
+          transaction_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          chain_id?: number | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          points_earned?: number | null
+          transaction_hash?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_points: {
+        Row: {
+          bridges_today: number | null
+          created_at: string | null
+          current_streak: number | null
+          gm_today: boolean | null
+          id: string
+          last_activity: string | null
+          rank: number | null
+          swaps_today: number | null
+          tokens_created_today: number | null
+          total_points: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bridges_today?: number | null
+          created_at?: string | null
+          current_streak?: number | null
+          gm_today?: boolean | null
+          id?: string
+          last_activity?: string | null
+          rank?: number | null
+          swaps_today?: number | null
+          tokens_created_today?: number | null
+          total_points?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bridges_today?: number | null
+          created_at?: string | null
+          current_streak?: number | null
+          gm_today?: boolean | null
+          id?: string
+          last_activity?: string | null
+          rank?: number | null
+          swaps_today?: number | null
+          tokens_created_today?: number | null
+          total_points?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_points: {
+        Args: {
+          p_user_id: string
+          p_points: number
+          p_activity_type: string
+          p_description: string
+          p_chain_id?: number
+          p_transaction_hash?: string
+        }
+        Returns: undefined
+      }
+      generate_referral_code: {
+        Args: { user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
