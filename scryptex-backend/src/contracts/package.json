@@ -1,0 +1,47 @@
+
+{
+  "name": "scryptex-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for the SCRYPTEX multi-chain deployment platform",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:basic": "node deployment/deploy-basic.js",
+    "deploy:tokens": "node deployment/deploy-tokens.js",
+    "deploy:defi": "node deployment/deploy-defi.js",
+    "deploy:utility": "node deployment/deploy-utility.js",
+    "deploy:single": "node deployment/deploy-all.js single",
+    "deploy:multi": "node deployment/deploy-all.js multi",
+    "deploy:all": "node deployment/deploy-all.js all",
+    "verify": "hardhat verify",
+    "flatten": "hardhat flatten",
+    "size": "hardhat size-contracts",
+    "coverage": "hardhat coverage",
+    "gas-report": "REPORT_GAS=true hardhat test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@chainlink/contracts": "^0.8.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.2",
+    "@nomicfoundation/hardhat-verify": "^1.1.1",
+    "@openzeppelin/hardhat-upgrades": "^1.28.0",
+    "hardhat": "^2.17.2",
+    "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.4"
+  },
+  "keywords": [
+    "blockchain",
+    "smart-contracts",
+    "solidity",
+    "defi",
+    "nft",
+    "testnet",
+    "deployment"
+  ],
+  "author": "SCRYPTEX Team",
+  "license": "MIT"
+}
