@@ -30,10 +30,10 @@ const ResponsiveTokenCreator = () => {
 
   if (isMobile) {
     return (
-      <div className="min-h-[calc(100vh-7rem)] w-full">
-        <div className="px-3 py-4 space-y-4 max-w-lg mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="container mx-auto px-4 py-6 max-w-md space-y-6">
           {/* Mobile Header */}
-          <div className="text-center space-y-2 px-2">
+          <div className="text-center space-y-2">
             <h1 className="text-2xl font-bold text-white flex items-center justify-center">
               <Rocket className="mr-2 h-6 w-6 text-emerald-400" />
               Create Token
@@ -43,7 +43,7 @@ const ResponsiveTokenCreator = () => {
 
           {/* Token Basic Info */}
           <Card className="bg-slate-900/50 border-slate-800">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <CardTitle className="text-white text-lg flex items-center">
                 <Plus className="mr-2 h-4 w-4 text-emerald-400" />
                 Token Details
@@ -57,7 +57,7 @@ const ResponsiveTokenCreator = () => {
                   value={tokenName}
                   onChange={(e) => setTokenName(e.target.value)}
                   placeholder="My Awesome Token"
-                  className="bg-slate-800 border-slate-700 text-white h-11 text-base"
+                  className="bg-slate-800 border-slate-700 text-white h-12 text-base"
                 />
               </div>
               <div className="space-y-2">
@@ -67,7 +67,7 @@ const ResponsiveTokenCreator = () => {
                   value={tokenSymbol}
                   onChange={(e) => setTokenSymbol(e.target.value.toUpperCase())}
                   placeholder="MAT"
-                  className="bg-slate-800 border-slate-700 text-white h-11 text-base"
+                  className="bg-slate-800 border-slate-700 text-white h-12 text-base"
                   maxLength={10}
                 />
               </div>
@@ -78,7 +78,7 @@ const ResponsiveTokenCreator = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe your token's purpose..."
-                  className="bg-slate-800 border-slate-700 text-white min-h-[80px] text-base resize-none"
+                  className="bg-slate-800 border-slate-700 text-white min-h-[80px] text-base"
                 />
               </div>
             </CardContent>
@@ -86,7 +86,7 @@ const ResponsiveTokenCreator = () => {
 
           {/* Chain Selection */}
           <Card className="bg-slate-900/50 border-slate-800">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <CardTitle className="text-white text-lg">Deployment Chain</CardTitle>
             </CardHeader>
             <CardContent>
@@ -99,14 +99,14 @@ const ResponsiveTokenCreator = () => {
 
           {/* Logo Upload */}
           <Card className="bg-slate-900/50 border-slate-800">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <CardTitle className="text-white text-lg">Token Logo</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="border-2 border-dashed border-slate-700 rounded-lg p-4 text-center">
-                <Upload className="h-6 w-6 text-slate-400 mx-auto mb-2" />
-                <p className="text-slate-400 text-xs mb-2">Upload your logo</p>
-                <Button variant="outline" className="border-slate-600 text-slate-300 h-9 text-sm">
+              <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-slate-400 text-sm mb-2">Upload your logo</p>
+                <Button variant="outline" className="border-slate-600 text-slate-300 h-10">
                   Choose File
                 </Button>
               </div>
@@ -115,14 +115,14 @@ const ResponsiveTokenCreator = () => {
 
           {/* Bonding Curve */}
           <Card className="bg-slate-900/50 border-slate-800">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <CardTitle className="text-white text-lg flex items-center">
                 <TrendingUp className="mr-2 h-4 w-4 text-emerald-400" />
                 Bonding Curve
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-slate-300 text-sm">Supply</Label>
                   <Input
@@ -143,15 +143,20 @@ const ResponsiveTokenCreator = () => {
             </CardContent>
           </Card>
 
-          {/* Deploy Button */}
-          <div className="pt-2 pb-4">
-            <Button 
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-semibold h-12"
-              disabled={!tokenName || !tokenSymbol || !selectedChain}
-            >
-              Deploy Token • ~0.05 ETH
-            </Button>
+          {/* Fixed Bottom Deploy Button */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-950/90 backdrop-blur-sm border-t border-slate-800">
+            <div className="max-w-md mx-auto">
+              <Button 
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-semibold h-12"
+                disabled={!tokenName || !tokenSymbol || !selectedChain}
+              >
+                Deploy Token • ~0.05 ETH
+              </Button>
+            </div>
           </div>
+
+          {/* Bottom spacing for fixed button */}
+          <div className="h-20" />
         </div>
       </div>
     );
@@ -159,8 +164,8 @@ const ResponsiveTokenCreator = () => {
 
   // Desktop Layout
   return (
-    <div className="min-h-[calc(100vh-8rem)] w-full">
-      <div className="py-6 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* Desktop Header */}
         <div className="text-center space-y-4 mb-8">
           <h1 className="text-4xl font-bold text-white flex items-center justify-center">
@@ -170,7 +175,7 @@ const ResponsiveTokenCreator = () => {
           <p className="text-slate-400 text-lg">Launch your token with automated bonding curves and instant trading</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Main Form */}
           <div className="lg:col-span-2 space-y-6">
             {/* Token Info Form */}
@@ -190,7 +195,7 @@ const ResponsiveTokenCreator = () => {
                       value={tokenName}
                       onChange={(e) => setTokenName(e.target.value)}
                       placeholder="My Awesome Token"
-                      className="bg-slate-800 border-slate-700 text-white h-11"
+                      className="bg-slate-800 border-slate-700 text-white"
                     />
                   </div>
                   <div className="space-y-2">
@@ -200,7 +205,7 @@ const ResponsiveTokenCreator = () => {
                       value={tokenSymbol}
                       onChange={(e) => setTokenSymbol(e.target.value.toUpperCase())}
                       placeholder="MAT"
-                      className="bg-slate-800 border-slate-700 text-white h-11"
+                      className="bg-slate-800 border-slate-700 text-white"
                       maxLength={10}
                     />
                   </div>
@@ -213,7 +218,7 @@ const ResponsiveTokenCreator = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe your token's purpose and utility..."
-                    className="bg-slate-800 border-slate-700 text-white min-h-[100px] resize-none"
+                    className="bg-slate-800 border-slate-700 text-white min-h-[100px]"
                   />
                 </div>
               </CardContent>
@@ -241,7 +246,7 @@ const ResponsiveTokenCreator = () => {
                       value={initialSupply}
                       onChange={(e) => setInitialSupply(e.target.value)}
                       placeholder="1000000"
-                      className="bg-slate-800 border-slate-700 text-white h-11"
+                      className="bg-slate-800 border-slate-700 text-white"
                     />
                   </div>
                   <div className="space-y-2">
@@ -251,7 +256,7 @@ const ResponsiveTokenCreator = () => {
                       value={startPrice}
                       onChange={(e) => setStartPrice(e.target.value)}
                       placeholder="0.001"
-                      className="bg-slate-800 border-slate-700 text-white h-11"
+                      className="bg-slate-800 border-slate-700 text-white"
                     />
                   </div>
                 </div>
@@ -276,7 +281,7 @@ const ResponsiveTokenCreator = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid gap-3 max-h-80 overflow-y-auto">
+                  <div className="grid gap-3 max-h-96 overflow-y-auto">
                     {chains.slice(0, 6).map((chain) => (
                       <Card
                         key={chain.id}
@@ -322,7 +327,7 @@ const ResponsiveTokenCreator = () => {
             </Card>
 
             {/* Deploy Section */}
-            <Card className="bg-slate-900/50 border-slate-800 sticky top-20">
+            <Card className="bg-slate-900/50 border-slate-800 sticky top-6">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="text-center">
