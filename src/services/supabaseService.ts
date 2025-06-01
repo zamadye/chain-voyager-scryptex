@@ -78,8 +78,6 @@ export class SupabaseService {
   }
 
   static async updateDailyActivity(userId: string, activityType: string) {
-    const today = new Date().toISOString().split('T')[0];
-    
     switch (activityType) {
       case 'gm':
         await supabase
@@ -88,34 +86,40 @@ export class SupabaseService {
           .eq('user_id', userId);
         break;
       case 'swap':
-        await supabase.rpc('sql', {
-          query: `
-            UPDATE user_points 
-            SET swaps_today = swaps_today + 1 
-            WHERE user_id = $1
-          `,
-          params: [userId]
-        });
+        const { data: currentSwaps } = await supabase
+          .from('user_points')
+          .select('swaps_today')
+          .eq('user_id', userId)
+          .single();
+        
+        await supabase
+          .from('user_points')
+          .update({ swaps_today: (currentSwaps?.swaps_today || 0) + 1 })
+          .eq('user_id', userId);
         break;
       case 'bridge':
-        await supabase.rpc('sql', {
-          query: `
-            UPDATE user_points 
-            SET bridges_today = bridges_today + 1 
-            WHERE user_id = $1
-          `,
-          params: [userId]
-        });
+        const { data: currentBridges } = await supabase
+          .from('user_points')
+          .select('bridges_today')
+          .eq('user_id', userId)
+          .single();
+        
+        await supabase
+          .from('user_points')
+          .update({ bridges_today: (currentBridges?.bridges_today || 0) + 1 })
+          .eq('user_id', userId);
         break;
       case 'token_creation':
-        await supabase.rpc('sql', {
-          query: `
-            UPDATE user_points 
-            SET tokens_created_today = tokens_created_today + 1 
-            WHERE user_id = $1
-          `,
-          params: [userId]
-        });
+        const { data: currentTokens } = await supabase
+          .from('user_points')
+          .select('tokens_created_today')
+          .eq('user_id', userId)
+          .single();
+        
+        await supabase
+          .from('user_points')
+          .update({ tokens_created_today: (currentTokens?.tokens_created_today || 0) + 1 })
+          .eq('user_id', userId);
         break;
     }
   }

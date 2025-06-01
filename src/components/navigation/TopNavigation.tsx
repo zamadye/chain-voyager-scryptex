@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,9 @@ import {
   Gift,
   BarChart3,
   HelpCircle,
-  FileText
+  FileText,
+  LogIn,
+  User
 } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import ChainSelector from './ChainSelector';
