@@ -13,7 +13,7 @@ export interface ChainModuleConfig {
 // Deployment parameters
 export interface DeployParams {
   contractName: string;
-  constructorArgs: any[];
+  constructorArgs: string[];
 }
 
 // Deployment result

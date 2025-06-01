@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 
-// Simple state interfaces
+// Simplified state interfaces to avoid circular references
 interface WalletData {
   address: string | null;
   isConnected: boolean;
@@ -92,15 +92,15 @@ interface NotificationData {
   read: boolean;
 }
 
-// Store interface
+// Store interface - simplified to avoid complex type inference
 interface AppStore {
   // Wallet
   wallet: WalletData;
   setWallet: (wallet: Partial<WalletData>) => void;
   
-  // Chains - using Map instead of Record
-  chainStatus: Map<string, ChainData>;
-  setChainStatus: (status: Map<string, ChainData>) => void;
+  // Chains - using Record instead of Map to avoid type issues
+  chainStatus: Record<string, ChainData>;
+  setChainStatus: (status: Record<string, ChainData>) => void;
   
   // Activities
   deployments: DeploymentData[];
@@ -144,8 +144,8 @@ export const useAppStore = create<AppStore>((set) => ({
     wallet: { ...state.wallet, ...wallet } 
   })),
   
-  // Chain status using Map
-  chainStatus: new Map(),
+  // Chain status using Record instead of Map
+  chainStatus: {},
   setChainStatus: (status) => set({ chainStatus: status }),
   
   // Deployments
