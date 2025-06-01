@@ -18,6 +18,11 @@ import Profile from "./pages/Profile";
 import HistoryPage from "./pages/History";
 import Create from "./pages/Create";
 import Bridge from "./pages/Bridge";
+import Points from "./pages/Points";
+import Referrals from "./pages/Referrals";
+import Settings from "./pages/Settings";
+import Support from "./pages/Support";
+import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +46,11 @@ const App = () => (
               <Route path="/chains" element={<Chains />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/history" element={<HistoryPage />} />
+              <Route path="/points" element={<Points />} />
+              <Route path="/referrals" element={<Referrals />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/docs" element={<Documentation />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
