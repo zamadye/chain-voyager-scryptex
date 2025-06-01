@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { getAllChains } from '@/lib/chains';
 import { ChainConfig } from '@/types';
-import { Upload, Plus, TrendingUp, Settings, Rocket } from 'lucide-react';
+import { Upload, Plus, TrendingUp, Settings, Rocket, Activity } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import ChainScrollSelector from './ChainScrollSelector';
 
 const ResponsiveTokenCreator = () => {
