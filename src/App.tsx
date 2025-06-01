@@ -1,8 +1,11 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { Toaster } from '@/components/ui/sonner';
 import { useSupabaseIntegration } from '@/hooks/useSupabaseIntegration';
+import { config } from '@/lib/web3-config';
 
 // Import all pages
 import Index from '@/pages/Index';
@@ -25,6 +28,9 @@ import NotFound from '@/pages/NotFound';
 
 import DEXLayout from '@/components/layout/DEXLayout';
 import './App.css';
+
+// Import RainbowKit styles
+import '@rainbow-me/rainbowkit/styles.css';
 
 const queryClient = new QueryClient();
 
@@ -60,10 +66,14 @@ const AppContent = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <AppContent />
-        <Toaster />
-      </Router>
+      <WagmiProvider config={config}>
+        <RainbowKitProvider>
+          <Router>
+            <AppContent />
+            <Toaster />
+          </Router>
+        </RainbowKitProvider>
+      </WagmiProvider>
     </QueryClientProvider>
   );
 }
