@@ -64,7 +64,7 @@ export class MegaETHModule extends BaseChainModule {
         value: parseEther('0.01'), // Higher amount for MegaETH
         account: walletClient.account,
         chain: this.chain,
-      });
+      } as any);
 
       console.log(`MegaETH interaction completed: ${hash}`);
       

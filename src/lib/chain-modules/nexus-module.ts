@@ -64,7 +64,7 @@ export class NexusModule extends BaseChainModule {
         value: parseEther('0.001'),
         account: walletClient.account,
         chain: this.chain,
-      });
+      } as any);
 
       console.log(`Nexus interaction completed: ${hash}`);
       

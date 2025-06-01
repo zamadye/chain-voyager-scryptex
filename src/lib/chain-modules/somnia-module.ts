@@ -64,7 +64,7 @@ export class SomniaModule extends BaseChainModule {
         value: parseEther('0.005'),
         account: walletClient.account,
         chain: this.chain,
-      });
+      } as any);
 
       console.log(`Somnia interaction completed: ${hash}`);
       

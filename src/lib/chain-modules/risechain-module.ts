@@ -64,7 +64,7 @@ export class RiseChainModule extends BaseChainModule {
         value: parseEther('0.002'),
         account: walletClient.account,
         chain: this.chain,
-      });
+      } as any);
 
       console.log(`RiseChain interaction completed: ${hash}`);
       

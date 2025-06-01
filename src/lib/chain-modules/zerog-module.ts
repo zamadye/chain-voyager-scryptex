@@ -63,7 +63,7 @@ export class ZeroGModule extends BaseChainModule {
         value: parseEther('0.001'),
         account: walletClient.account,
         chain: this.chain,
-      });
+      } as any);
 
       console.log(`0G interaction completed: ${hash}`);
       
