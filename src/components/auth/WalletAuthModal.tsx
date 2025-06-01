@@ -26,7 +26,10 @@ export const WalletAuthModal = ({ children }: WalletAuthModalProps) => {
 
     try {
       const message = `Authenticate with SCRYPTEX\nWallet: ${address}\nTimestamp: ${Date.now()}`;
-      const signature = await signMessageAsync({ message });
+      const signature = await signMessageAsync({ 
+        message,
+        account: address
+      });
       
       await authenticateWallet(address, signature, message);
       toast.success('Wallet authenticated successfully!');

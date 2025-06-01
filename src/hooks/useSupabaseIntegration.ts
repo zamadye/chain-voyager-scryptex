@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useAppStore } from '@/stores/useAppStore';
@@ -85,10 +86,16 @@ export const useSupabaseIntegration = () => {
         timestamp: formatTimestamp(activity.created_at)
       }));
 
-      setUserPoints(prev => prev ? {
-        ...prev,
+      setUserPoints({
+        totalPoints: userPoints?.total_points || 0,
+        currentStreak: userPoints?.current_streak || 0,
+        rank: userPoints?.rank || null,
+        gmToday: userPoints?.gm_today || false,
+        swapsToday: userPoints?.swaps_today || 0,
+        bridgesToday: userPoints?.bridges_today || 0,
+        tokensCreatedToday: userPoints?.tokens_created_today || 0,
         recentActivity: formattedActivities
-      } : null);
+      });
 
     } catch (error) {
       console.error('Error loading user data:', error);

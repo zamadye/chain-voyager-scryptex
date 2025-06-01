@@ -54,9 +54,13 @@ export class SupabaseService {
   }
 
   static async createWalletProfile(walletAddress: string): Promise<Profile> {
+    // Generate a UUID for the profile
+    const profileId = crypto.randomUUID();
+    
     const { data, error } = await supabase
       .from('profiles')
       .insert({
+        id: profileId,
         wallet_address: walletAddress.toLowerCase(),
         username: `user_${walletAddress.slice(-8)}`
       })
