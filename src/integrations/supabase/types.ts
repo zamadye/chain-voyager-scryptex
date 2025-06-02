@@ -48,6 +48,147 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_records: {
+        Row: {
+          action: string
+          activity_type: string
+          compliance_flags: Json | null
+          created_at: string | null
+          id: string
+          institutional_account_id: string | null
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          resource_id: string | null
+          resource_type: string
+          risk_level: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          activity_type: string
+          compliance_flags?: Json | null
+          created_at?: string | null
+          id?: string
+          institutional_account_id?: string | null
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          risk_level?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          activity_type?: string
+          compliance_flags?: Json | null
+          created_at?: string | null
+          id?: string
+          institutional_account_id?: string | null
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          risk_level?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_records_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bi_reports: {
+        Row: {
+          created_at: string | null
+          delivery_method: string | null
+          generated_by: string | null
+          generated_for_period: string
+          id: string
+          institutional_account_id: string | null
+          is_scheduled: boolean | null
+          last_generated: string | null
+          next_generation: string | null
+          recipients: Json | null
+          report_config: Json
+          report_data: Json
+          report_name: string
+          report_type: string
+          schedule_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_method?: string | null
+          generated_by?: string | null
+          generated_for_period: string
+          id?: string
+          institutional_account_id?: string | null
+          is_scheduled?: boolean | null
+          last_generated?: string | null
+          next_generation?: string | null
+          recipients?: Json | null
+          report_config?: Json
+          report_data?: Json
+          report_name: string
+          report_type: string
+          schedule_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_method?: string | null
+          generated_by?: string | null
+          generated_for_period?: string
+          id?: string
+          institutional_account_id?: string | null
+          is_scheduled?: boolean | null
+          last_generated?: string | null
+          next_generation?: string | null
+          recipients?: Json | null
+          report_config?: Json
+          report_data?: Json
+          report_name?: string
+          report_type?: string
+          schedule_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bi_reports_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bi_reports_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competition_participants: {
         Row: {
           competition_id: string
@@ -167,6 +308,72 @@ export type Database = {
             columns: ["winner_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_records: {
+        Row: {
+          assessor_id: string | null
+          compliance_data: Json
+          compliance_status: string
+          compliance_type: string
+          created_at: string | null
+          id: string
+          institutional_account_id: string
+          jurisdiction: string
+          last_assessment: string | null
+          next_review_date: string | null
+          regulation_name: string
+          remediation_notes: string | null
+          risk_score: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          assessor_id?: string | null
+          compliance_data?: Json
+          compliance_status: string
+          compliance_type: string
+          created_at?: string | null
+          id?: string
+          institutional_account_id: string
+          jurisdiction: string
+          last_assessment?: string | null
+          next_review_date?: string | null
+          regulation_name: string
+          remediation_notes?: string | null
+          risk_score?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          assessor_id?: string | null
+          compliance_data?: Json
+          compliance_status?: string
+          compliance_type?: string
+          created_at?: string | null
+          id?: string
+          institutional_account_id?: string
+          jurisdiction?: string
+          last_assessment?: string | null
+          next_review_date?: string | null
+          regulation_name?: string
+          remediation_notes?: string | null
+          risk_score?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_records_assessor_id_fkey"
+            columns: ["assessor_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_records_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -379,6 +586,302 @@ export type Database = {
           },
         ]
       }
+      institutional_accounts: {
+        Row: {
+          account_name: string
+          account_type: string
+          billing_contact_id: string | null
+          compliance_level: string | null
+          contract_expiry: string | null
+          created_at: string | null
+          id: string
+          jurisdiction: string
+          kyc_status: string | null
+          legal_name: string
+          onboarding_date: string | null
+          primary_contact_id: string | null
+          regulatory_identifiers: Json | null
+          risk_profile: Json | null
+          service_tier: string | null
+          total_aum: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_name: string
+          account_type: string
+          billing_contact_id?: string | null
+          compliance_level?: string | null
+          contract_expiry?: string | null
+          created_at?: string | null
+          id?: string
+          jurisdiction: string
+          kyc_status?: string | null
+          legal_name: string
+          onboarding_date?: string | null
+          primary_contact_id?: string | null
+          regulatory_identifiers?: Json | null
+          risk_profile?: Json | null
+          service_tier?: string | null
+          total_aum?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_name?: string
+          account_type?: string
+          billing_contact_id?: string | null
+          compliance_level?: string | null
+          contract_expiry?: string | null
+          created_at?: string | null
+          id?: string
+          jurisdiction?: string
+          kyc_status?: string | null
+          legal_name?: string
+          onboarding_date?: string | null
+          primary_contact_id?: string | null
+          regulatory_identifiers?: Json | null
+          risk_profile?: Json | null
+          service_tier?: string | null
+          total_aum?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      institutional_team_members: {
+        Row: {
+          created_at: string | null
+          id: string
+          institutional_account_id: string
+          invited_by: string | null
+          is_active: boolean | null
+          joined_at: string | null
+          permissions: Json
+          role: string
+          trading_limits: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          institutional_account_id: string
+          invited_by?: string | null
+          is_active?: boolean | null
+          joined_at?: string | null
+          permissions?: Json
+          role: string
+          trading_limits?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          institutional_account_id?: string
+          invited_by?: string | null
+          is_active?: boolean | null
+          joined_at?: string | null
+          permissions?: Json
+          role?: string
+          trading_limits?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institutional_team_members_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institutional_team_members_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "institutional_team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_making_strategies: {
+        Row: {
+          average_spread_capture: number | null
+          base_spread: number
+          created_at: string | null
+          created_by: string
+          id: string
+          institutional_account_id: string
+          inventory_limits: Json
+          inventory_turnover: number | null
+          is_active: boolean | null
+          last_quote_time: string | null
+          order_size: number
+          performance_metrics: Json | null
+          risk_controls: Json
+          strategy_name: string
+          target_markets: Json
+          total_pnl: number | null
+          total_volume: number | null
+          updated_at: string | null
+          uptime_percentage: number | null
+        }
+        Insert: {
+          average_spread_capture?: number | null
+          base_spread?: number
+          created_at?: string | null
+          created_by: string
+          id?: string
+          institutional_account_id: string
+          inventory_limits?: Json
+          inventory_turnover?: number | null
+          is_active?: boolean | null
+          last_quote_time?: string | null
+          order_size: number
+          performance_metrics?: Json | null
+          risk_controls?: Json
+          strategy_name: string
+          target_markets?: Json
+          total_pnl?: number | null
+          total_volume?: number | null
+          updated_at?: string | null
+          uptime_percentage?: number | null
+        }
+        Update: {
+          average_spread_capture?: number | null
+          base_spread?: number
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          institutional_account_id?: string
+          inventory_limits?: Json
+          inventory_turnover?: number | null
+          is_active?: boolean | null
+          last_quote_time?: string | null
+          order_size?: number
+          performance_metrics?: Json | null
+          risk_controls?: Json
+          strategy_name?: string
+          target_markets?: Json
+          total_pnl?: number | null
+          total_volume?: number | null
+          updated_at?: string | null
+          uptime_percentage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_making_strategies_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_making_strategies_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ml_models: {
+        Row: {
+          accuracy_score: number | null
+          created_at: string | null
+          created_by: string
+          deployment_status: string | null
+          f1_score: number | null
+          features: Json
+          hyperparameters: Json
+          id: string
+          institutional_account_id: string
+          last_prediction_date: string | null
+          last_training_date: string | null
+          model_name: string
+          model_type: string
+          model_version: number | null
+          parent_model_id: string | null
+          performance_metrics: Json | null
+          precision_score: number | null
+          recall_score: number | null
+          training_data_config: Json
+          updated_at: string | null
+        }
+        Insert: {
+          accuracy_score?: number | null
+          created_at?: string | null
+          created_by: string
+          deployment_status?: string | null
+          f1_score?: number | null
+          features?: Json
+          hyperparameters?: Json
+          id?: string
+          institutional_account_id: string
+          last_prediction_date?: string | null
+          last_training_date?: string | null
+          model_name: string
+          model_type: string
+          model_version?: number | null
+          parent_model_id?: string | null
+          performance_metrics?: Json | null
+          precision_score?: number | null
+          recall_score?: number | null
+          training_data_config?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          accuracy_score?: number | null
+          created_at?: string | null
+          created_by?: string
+          deployment_status?: string | null
+          f1_score?: number | null
+          features?: Json
+          hyperparameters?: Json
+          id?: string
+          institutional_account_id?: string
+          last_prediction_date?: string | null
+          last_training_date?: string | null
+          model_name?: string
+          model_type?: string
+          model_version?: number | null
+          parent_model_id?: string | null
+          performance_metrics?: Json | null
+          precision_score?: number | null
+          recall_score?: number | null
+          training_data_config?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ml_models_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ml_models_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ml_models_parent_model_id_fkey"
+            columns: ["parent_model_id"]
+            isOneToOne: false
+            referencedRelation: "ml_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -416,6 +919,71 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_revenue: {
+        Row: {
+          active_users: number | null
+          additional_fees: number | null
+          adjustments: number | null
+          created_at: string | null
+          id: string
+          new_users: number | null
+          partner_revenue: number | null
+          payout_date: string | null
+          payout_status: string | null
+          platform_revenue: number | null
+          reporting_period: string
+          revenue_share_rate: number
+          total_fees: number | null
+          total_volume: number | null
+          transaction_count: number | null
+          white_label_instance_id: string
+        }
+        Insert: {
+          active_users?: number | null
+          additional_fees?: number | null
+          adjustments?: number | null
+          created_at?: string | null
+          id?: string
+          new_users?: number | null
+          partner_revenue?: number | null
+          payout_date?: string | null
+          payout_status?: string | null
+          platform_revenue?: number | null
+          reporting_period: string
+          revenue_share_rate: number
+          total_fees?: number | null
+          total_volume?: number | null
+          transaction_count?: number | null
+          white_label_instance_id: string
+        }
+        Update: {
+          active_users?: number | null
+          additional_fees?: number | null
+          adjustments?: number | null
+          created_at?: string | null
+          id?: string
+          new_users?: number | null
+          partner_revenue?: number | null
+          payout_date?: string | null
+          payout_status?: string | null
+          platform_revenue?: number | null
+          reporting_period?: string
+          revenue_share_rate?: number
+          total_fees?: number | null
+          total_volume?: number | null
+          transaction_count?: number | null
+          white_label_instance_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_revenue_white_label_instance_id_fkey"
+            columns: ["white_label_instance_id"]
+            isOneToOne: false
+            referencedRelation: "white_label_instances"
             referencedColumns: ["id"]
           },
         ]
@@ -489,6 +1057,93 @@ export type Database = {
         }
         Relationships: []
       }
+      quant_strategies: {
+        Row: {
+          allocated_capital: number | null
+          backtest_results: Json | null
+          created_at: string | null
+          created_by: string
+          current_pnl: number | null
+          deployment_date: string | null
+          description: string | null
+          id: string
+          institutional_account_id: string
+          is_live: boolean | null
+          last_rebalance: string | null
+          max_drawdown: number | null
+          next_rebalance: string | null
+          performance_metrics: Json | null
+          risk_parameters: Json
+          sharpe_ratio: number | null
+          status: string | null
+          strategy_config: Json
+          strategy_name: string
+          strategy_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          allocated_capital?: number | null
+          backtest_results?: Json | null
+          created_at?: string | null
+          created_by: string
+          current_pnl?: number | null
+          deployment_date?: string | null
+          description?: string | null
+          id?: string
+          institutional_account_id: string
+          is_live?: boolean | null
+          last_rebalance?: string | null
+          max_drawdown?: number | null
+          next_rebalance?: string | null
+          performance_metrics?: Json | null
+          risk_parameters?: Json
+          sharpe_ratio?: number | null
+          status?: string | null
+          strategy_config?: Json
+          strategy_name: string
+          strategy_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          allocated_capital?: number | null
+          backtest_results?: Json | null
+          created_at?: string | null
+          created_by?: string
+          current_pnl?: number | null
+          deployment_date?: string | null
+          description?: string | null
+          id?: string
+          institutional_account_id?: string
+          is_live?: boolean | null
+          last_rebalance?: string | null
+          max_drawdown?: number | null
+          next_rebalance?: string | null
+          performance_metrics?: Json | null
+          risk_parameters?: Json
+          sharpe_ratio?: number | null
+          status?: string | null
+          strategy_config?: Json
+          strategy_name?: string
+          strategy_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quant_strategies_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quant_strategies_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           created_at: string | null
@@ -530,6 +1185,104 @@ export type Database = {
             columns: ["referrer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regulatory_reports: {
+        Row: {
+          acceptance_date: string | null
+          checksum: string | null
+          created_at: string | null
+          file_path: string | null
+          generated_by: string | null
+          id: string
+          institutional_account_id: string
+          jurisdiction: string
+          rejection_reason: string | null
+          report_data: Json
+          report_type: string
+          reporting_period: string
+          reviewed_by: string | null
+          status: string | null
+          submission_date: string | null
+          submission_deadline: string | null
+          submission_id: string | null
+          submitted_by: string | null
+          updated_at: string | null
+          validation_results: Json | null
+        }
+        Insert: {
+          acceptance_date?: string | null
+          checksum?: string | null
+          created_at?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          id?: string
+          institutional_account_id: string
+          jurisdiction: string
+          rejection_reason?: string | null
+          report_data?: Json
+          report_type: string
+          reporting_period: string
+          reviewed_by?: string | null
+          status?: string | null
+          submission_date?: string | null
+          submission_deadline?: string | null
+          submission_id?: string | null
+          submitted_by?: string | null
+          updated_at?: string | null
+          validation_results?: Json | null
+        }
+        Update: {
+          acceptance_date?: string | null
+          checksum?: string | null
+          created_at?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          id?: string
+          institutional_account_id?: string
+          jurisdiction?: string
+          rejection_reason?: string | null
+          report_data?: Json
+          report_type?: string
+          reporting_period?: string
+          reviewed_by?: string | null
+          status?: string | null
+          submission_date?: string | null
+          submission_deadline?: string | null
+          submission_id?: string | null
+          submitted_by?: string | null
+          updated_at?: string | null
+          validation_results?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regulatory_reports_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regulatory_reports_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regulatory_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regulatory_reports_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -583,6 +1336,50 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_performance_metrics: {
+        Row: {
+          created_at: string | null
+          id: string
+          institutional_account_id: string | null
+          measurement_timestamp: string
+          metadata: Json | null
+          metric_name: string
+          metric_type: string
+          metric_unit: string | null
+          metric_value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          institutional_account_id?: string | null
+          measurement_timestamp: string
+          metadata?: Json | null
+          metric_name: string
+          metric_type: string
+          metric_unit?: string | null
+          metric_value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          institutional_account_id?: string | null
+          measurement_timestamp?: string
+          metadata?: Json | null
+          metric_name?: string
+          metric_type?: string
+          metric_unit?: string | null
+          metric_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_performance_metrics_institutional_account_id_fkey"
+            columns: ["institutional_account_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -827,6 +1624,81 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      white_label_instances: {
+        Row: {
+          api_endpoints: Json | null
+          branding_config: Json
+          business_contact_email: string | null
+          contract_end_date: string | null
+          contract_start_date: string | null
+          created_at: string | null
+          custom_domain: string | null
+          enabled_features: Json
+          feature_limits: Json | null
+          go_live_date: string | null
+          id: string
+          instance_name: string
+          monthly_fee: number | null
+          partner_id: string
+          partner_name: string
+          revenue_share_percentage: number | null
+          setup_fee: number | null
+          status: string | null
+          subdomain: string | null
+          technical_contact_email: string | null
+          updated_at: string | null
+          webhook_urls: Json | null
+        }
+        Insert: {
+          api_endpoints?: Json | null
+          branding_config?: Json
+          business_contact_email?: string | null
+          contract_end_date?: string | null
+          contract_start_date?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          enabled_features?: Json
+          feature_limits?: Json | null
+          go_live_date?: string | null
+          id?: string
+          instance_name: string
+          monthly_fee?: number | null
+          partner_id: string
+          partner_name: string
+          revenue_share_percentage?: number | null
+          setup_fee?: number | null
+          status?: string | null
+          subdomain?: string | null
+          technical_contact_email?: string | null
+          updated_at?: string | null
+          webhook_urls?: Json | null
+        }
+        Update: {
+          api_endpoints?: Json | null
+          branding_config?: Json
+          business_contact_email?: string | null
+          contract_end_date?: string | null
+          contract_start_date?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          enabled_features?: Json
+          feature_limits?: Json | null
+          go_live_date?: string | null
+          id?: string
+          instance_name?: string
+          monthly_fee?: number | null
+          partner_id?: string
+          partner_name?: string
+          revenue_share_percentage?: number | null
+          setup_fee?: number | null
+          status?: string | null
+          subdomain?: string | null
+          technical_contact_email?: string | null
+          updated_at?: string | null
+          webhook_urls?: Json | null
         }
         Relationships: []
       }

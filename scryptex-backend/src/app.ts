@@ -10,11 +10,12 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import healthRoutes from './routes/health';
 
-// Import new routes
+// Import all phase routes
 import chainRoutes from '@/routes/chainRoutes';
 import tradingRoutes from '@/routes/tradingRoutes';
 import portfolioRoutes from '@/routes/portfolioRoutes';
 import socialRoutes from '@/routes/socialRoutes';
+import enterpriseRoutes from '@/routes/enterpriseRoutes';
 
 const app = express();
 
@@ -43,13 +44,22 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// API Routes
+// API Routes - All 5 Phases
 app.use('/api/auth', authRoutes);
 app.use('/api/health', healthRoutes);
+
+// Phase 2: Multi-Chain Infrastructure
 app.use('/api/chains', chainRoutes);
+
+// Phase 3: Advanced Trading Engine
 app.use('/api/trading', tradingRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+
+// Phase 4: Social Trading Platform
 app.use('/api/social', socialRoutes);
+
+// Phase 5: Enterprise & Institutional Platform
+app.use('/api/enterprise', enterpriseRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
