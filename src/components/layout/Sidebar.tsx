@@ -1,171 +1,196 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
+import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { 
-  LayoutDashboard, 
-  Rocket, 
-  ArrowLeftRight, 
-  Sun, 
-  BarChart3, 
-  Link as ChainIcon,
-  User,
-  History,
-  Zap,
-  ChevronUp
+import {
+  Home, Shuffle, Repeat, BarChart3, History, User, Settings,
+  Gift, UserPlus, Coins, Sun, FileText, HelpCircle, Building2,
+  Layers, Wrench, Zap
 } from 'lucide-react';
-import { useAppStore } from '@/stores/useAppStore';
-import { SUPPORTED_CHAINS } from '@/lib/chains';
 
-const Sidebar = ({ className }: { className?: string }) => {
-  const location = useLocation();
-  const { chainStatus, deployments, swaps, gmPosts } = useAppStore();
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
+const Sidebar = () => {
   const navigation = [
-    {
-      name: 'Dashboard',
-      href: '/',
-      icon: LayoutDashboard,
-      badge: null,
-    },
-    {
-      name: 'Deploy',
-      href: '/deploy',
-      icon: Rocket,
-      badge: deployments.filter(d => d.status === 'pending').length || null,
-    },
-    {
-      name: 'Swap',
-      href: '/swap',
-      icon: ArrowLeftRight,
-      badge: swaps.filter(s => s.status === 'pending').length || null,
-    },
-    {
-      name: 'GM Ritual',
-      href: '/gm',
-      icon: Sun,
-      badge: gmPosts.filter(g => g.status === 'pending').length || null,
-    },
-    {
-      name: 'Analytics',
-      href: '/analytics',
-      icon: BarChart3,
-      badge: null,
-    },
-    {
-      name: 'Chains',
-      href: '/chains',
-      icon: ChainIcon,
-      badge: null,
-    },
-    {
-      name: 'Profile',
-      href: '/profile',
-      icon: User,
-      badge: null,
-    },
-    {
-      name: 'History',
-      href: '/history',
-      icon: History,
-      badge: null,
-    },
+    { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Chains', href: '/chains', icon: Layers },
+    { name: 'Create', href: '/create', icon: Wrench },
+    { name: 'Deploy', href: '/deploy', icon: Zap },
+    { name: 'Swap', href: '/swap', icon: Repeat },
+    { name: 'Bridge', href: '/bridge', icon: Shuffle },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'History', href: '/history', icon: History },
   ];
 
-  const activeChains = Object.values(chainStatus).filter(status => status?.isActive).length;
+  const enterpriseNav = [
+    { name: 'Enterprise', href: '/enterprise', icon: Building2 },
+  ];
+
+  const socialNav = [
+    { name: 'Points', href: '/points', icon: Gift },
+    { name: 'Referrals', href: '/referrals', icon: UserPlus },
+    { name: 'Earn STEX', href: '/earn-stex', icon: Coins },
+    { name: 'GM Protocol', href: '/gm', icon: Sun },
+  ];
+
+  const accountNav = [
+    { name: 'Profile', href: '/profile', icon: User },
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ];
+
+  const supportNav = [
+    { name: 'Documentation', href: '/docs', icon: FileText },
+    { name: 'Support', href: '/support', icon: HelpCircle },
+  ];
 
   return (
-    <div className={cn("flex h-full w-64 flex-col bg-gray-950/50 border-r border-purple-900/20", className)}>
-      {/* Sidebar Header */}
-      <div className="p-6 border-b border-gray-800">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Navigation</h2>
-          <Badge variant="outline" className="border-green-500/50 text-green-400">
-            {activeChains} Active
-          </Badge>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-2">
-          {navigation.map((item) => {
-            const isActive = location.pathname === item.href;
-            return (
-              <Link key={item.name} to={item.href}>
-                <Button
-                  variant={isActive ? "secondary" : "ghost"}
-                  className={cn(
-                    "w-full justify-start font-medium transition-colors",
-                    isActive 
-                      ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" 
-                      : "text-gray-300 hover:text-white hover:bg-gray-800"
-                  )}
-                >
-                  <item.icon className="mr-3 h-4 w-4" />
-                  {item.name}
-                  {item.badge && (
-                    <Badge 
-                      variant="destructive" 
-                      className="ml-auto h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                    >
-                      {item.badge}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Chain Status Quick View */}
-        <div className="mt-8 p-4 rounded-lg bg-gray-900/50 border border-gray-800">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Chain Status</h3>
-          <div className="space-y-2">
-            {Object.entries(SUPPORTED_CHAINS).slice(0, 4).map(([key, chain]) => {
-              const status = chainStatus[key];
-              const isActive = status?.isActive ?? false;
-              
-              return (
-                <div key={key} className="flex items-center justify-between text-xs">
-                  <span className="text-gray-300 truncate">{chain.name}</span>
-                  <div className={cn(
-                    "h-2 w-2 rounded-full",
-                    isActive ? "bg-green-500" : "bg-gray-600"
-                  )} />
-                </div>
-              );
-            })}
-            <Link to="/chains">
-              <Button variant="ghost" size="sm" className="w-full mt-2 text-purple-400 hover:text-purple-300">
-                <Zap className="mr-2 h-3 w-3" />
-                View All Chains
-              </Button>
-            </Link>
+    <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+      <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-900/95 backdrop-blur-sm border-r border-slate-800 px-6 pb-4">
+        <div className="flex h-16 shrink-0 items-center">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">S</span>
+            </div>
+            <span className="text-white font-bold text-xl">SCRYPTEX</span>
           </div>
         </div>
+        
+        <nav className="flex flex-1 flex-col">
+          <ul role="list" className="flex flex-1 flex-col gap-y-7">
+            {/* Main Navigation */}
+            <li>
+              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
+                Platform
+              </div>
+              <ul role="list" className="-mx-2 mt-2 space-y-1">
+                {navigation.map((item) => (
+                  <li key={item.name}>
+                    <NavLink
+                      to={item.href}
+                      className={({ isActive }) =>
+                        cn(
+                          isActive
+                            ? 'bg-slate-800 text-white'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                        )
+                      }
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {item.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </li>
 
-        {/* Back to Top Button */}
-        <div className="mt-6 px-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={scrollToTop}
-            className="w-full text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-          >
-            <ChevronUp className="mr-2 h-4 w-4" />
-            Back to Top
-          </Button>
-        </div>
-      </ScrollArea>
+            {/* Enterprise Navigation */}
+            <li>
+              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
+                Enterprise
+              </div>
+              <ul role="list" className="-mx-2 mt-2 space-y-1">
+                {enterpriseNav.map((item) => (
+                  <li key={item.name}>
+                    <NavLink
+                      to={item.href}
+                      className={({ isActive }) =>
+                        cn(
+                          isActive
+                            ? 'bg-slate-800 text-white'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                        )
+                      }
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {item.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </li>
+
+            {/* Social & Rewards */}
+            <li>
+              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
+                Social & Rewards
+              </div>
+              <ul role="list" className="-mx-2 mt-2 space-y-1">
+                {socialNav.map((item) => (
+                  <li key={item.name}>
+                    <NavLink
+                      to={item.href}
+                      className={({ isActive }) =>
+                        cn(
+                          isActive
+                            ? 'bg-slate-800 text-white'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                        )
+                      }
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {item.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </li>
+
+            {/* Account */}
+            <li>
+              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
+                Account
+              </div>
+              <ul role="list" className="-mx-2 mt-2 space-y-1">
+                {accountNav.map((item) => (
+                  <li key={item.name}>
+                    <NavLink
+                      to={item.href}
+                      className={({ isActive }) =>
+                        cn(
+                          isActive
+                            ? 'bg-slate-800 text-white'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                        )
+                      }
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {item.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </li>
+
+            {/* Support */}
+            <li className="mt-auto">
+              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
+                Support
+              </div>
+              <ul role="list" className="-mx-2 mt-2 space-y-1">
+                {supportNav.map((item) => (
+                  <li key={item.name}>
+                    <NavLink
+                      to={item.href}
+                      className={({ isActive }) =>
+                        cn(
+                          isActive
+                            ? 'bg-slate-800 text-white'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                        )
+                      }
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {item.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   );
 };
