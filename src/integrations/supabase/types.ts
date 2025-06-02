@@ -9,6 +9,225 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          badge_icon: string | null
+          category: string
+          created_at: string | null
+          description: string
+          difficulty: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          points_reward: number | null
+          requirements: Json
+        }
+        Insert: {
+          badge_icon?: string | null
+          category: string
+          created_at?: string | null
+          description: string
+          difficulty?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points_reward?: number | null
+          requirements: Json
+        }
+        Update: {
+          badge_icon?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string
+          difficulty?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points_reward?: number | null
+          requirements?: Json
+        }
+        Relationships: []
+      }
+      competition_participants: {
+        Row: {
+          competition_id: string
+          current_balance: number
+          id: string
+          is_active: boolean | null
+          joined_at: string | null
+          rank: number | null
+          starting_balance: number
+          total_return: number | null
+          user_id: string
+        }
+        Insert: {
+          competition_id: string
+          current_balance: number
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          rank?: number | null
+          starting_balance: number
+          total_return?: number | null
+          user_id: string
+        }
+        Update: {
+          competition_id?: string
+          current_balance?: number
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          rank?: number | null
+          starting_balance?: number
+          total_return?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_participants_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitions: {
+        Row: {
+          competition_type: string
+          created_at: string | null
+          created_by: string | null
+          current_participants: number | null
+          description: string | null
+          end_date: string
+          entry_fee: number | null
+          id: string
+          max_participants: number | null
+          name: string
+          prize_pool: number
+          rules: Json
+          start_date: string
+          status: string | null
+          updated_at: string | null
+          winner_id: string | null
+        }
+        Insert: {
+          competition_type: string
+          created_at?: string | null
+          created_by?: string | null
+          current_participants?: number | null
+          description?: string | null
+          end_date: string
+          entry_fee?: number | null
+          id?: string
+          max_participants?: number | null
+          name: string
+          prize_pool: number
+          rules: Json
+          start_date: string
+          status?: string | null
+          updated_at?: string | null
+          winner_id?: string | null
+        }
+        Update: {
+          competition_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          current_participants?: number | null
+          description?: string | null
+          end_date?: string
+          entry_fee?: number | null
+          id?: string
+          max_participants?: number | null
+          name?: string
+          prize_pool?: number
+          rules?: Json
+          start_date?: string
+          status?: string | null
+          updated_at?: string | null
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competitions_winner_id_fkey"
+            columns: ["winner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copy_trading_follows: {
+        Row: {
+          copy_percentage: number
+          created_at: string | null
+          follower_id: string
+          id: string
+          is_active: boolean | null
+          max_trade_size: number | null
+          stop_loss_threshold: number | null
+          total_copied_volume: number | null
+          total_profit_loss: number | null
+          trader_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          copy_percentage: number
+          created_at?: string | null
+          follower_id: string
+          id?: string
+          is_active?: boolean | null
+          max_trade_size?: number | null
+          stop_loss_threshold?: number | null
+          total_copied_volume?: number | null
+          total_profit_loss?: number | null
+          trader_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          copy_percentage?: number
+          created_at?: string | null
+          follower_id?: string
+          id?: string
+          is_active?: boolean | null
+          max_trade_size?: number | null
+          stop_loss_threshold?: number | null
+          total_copied_volume?: number | null
+          total_profit_loss?: number | null
+          trader_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copy_trading_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copy_trading_follows_trader_id_fkey"
+            columns: ["trader_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_tasks: {
         Row: {
           completed: boolean | null
@@ -52,6 +271,193 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_proposals: {
+        Row: {
+          abstain_votes: number | null
+          created_at: string | null
+          description: string
+          id: string
+          implementation_details: Json | null
+          minimum_votes: number | null
+          no_votes: number | null
+          proposal_type: string
+          proposer_id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          voting_end_date: string
+          yes_votes: number | null
+        }
+        Insert: {
+          abstain_votes?: number | null
+          created_at?: string | null
+          description: string
+          id?: string
+          implementation_details?: Json | null
+          minimum_votes?: number | null
+          no_votes?: number | null
+          proposal_type: string
+          proposer_id: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          voting_end_date: string
+          yes_votes?: number | null
+        }
+        Update: {
+          abstain_votes?: number | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          implementation_details?: Json | null
+          minimum_votes?: number | null
+          no_votes?: number | null
+          proposal_type?: string
+          proposer_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          voting_end_date?: string
+          yes_votes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_proposals_proposer_id_fkey"
+            columns: ["proposer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_votes: {
+        Row: {
+          created_at: string | null
+          id: string
+          proposal_id: string
+          reason: string | null
+          user_id: string
+          vote: string
+          voting_power: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          proposal_id: string
+          reason?: string | null
+          user_id: string
+          vote: string
+          voting_power: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          proposal_id?: string
+          reason?: string | null
+          user_id?: string
+          vote?: string
+          voting_power?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_votes_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "governance_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_interactions: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          interaction_type: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_interactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -124,6 +530,163 @@ export type Database = {
             columns: ["referrer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          attachments: Json | null
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          post_type: string
+          shares_count: number | null
+          trade_reference: string | null
+          updated_at: string | null
+          user_id: string
+          visibility: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_type: string
+          shares_count?: number | null
+          trade_reference?: string | null
+          updated_at?: string | null
+          user_id: string
+          visibility?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_type?: string
+          shares_count?: number | null
+          trade_reference?: string | null
+          updated_at?: string | null
+          user_id?: string
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trader_profiles: {
+        Row: {
+          average_return: number | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          follower_count: number | null
+          id: string
+          max_drawdown: number | null
+          public_performance: boolean | null
+          risk_level: string | null
+          sharpe_ratio: number | null
+          total_copied_volume: number | null
+          trading_style: string | null
+          updated_at: string | null
+          user_id: string
+          verified_trader: boolean | null
+          win_rate: number | null
+        }
+        Insert: {
+          average_return?: number | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          follower_count?: number | null
+          id?: string
+          max_drawdown?: number | null
+          public_performance?: boolean | null
+          risk_level?: string | null
+          sharpe_ratio?: number | null
+          total_copied_volume?: number | null
+          trading_style?: string | null
+          updated_at?: string | null
+          user_id: string
+          verified_trader?: boolean | null
+          win_rate?: number | null
+        }
+        Update: {
+          average_return?: number | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          follower_count?: number | null
+          id?: string
+          max_drawdown?: number | null
+          public_performance?: boolean | null
+          risk_level?: string | null
+          sharpe_ratio?: number | null
+          total_copied_volume?: number | null
+          trading_style?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verified_trader?: boolean | null
+          win_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trader_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          progress: Json | null
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          progress?: Json | null
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          progress?: Json | null
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -224,6 +787,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          influence_rank: number | null
+          kyc_verified: boolean | null
+          social_score: number | null
+          total_referrals: number | null
+          trading_tier: string | null
+          updated_at: string | null
+          username: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          influence_rank?: number | null
+          kyc_verified?: boolean | null
+          social_score?: number | null
+          total_referrals?: number | null
+          trading_tier?: string | null
+          updated_at?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          influence_rank?: number | null
+          kyc_verified?: boolean | null
+          social_score?: number | null
+          total_referrals?: number | null
+          trading_tier?: string | null
+          updated_at?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

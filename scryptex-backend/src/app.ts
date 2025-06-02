@@ -1,3 +1,4 @@
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -13,6 +14,7 @@ import healthRoutes from './routes/health';
 import chainRoutes from '@/routes/chainRoutes';
 import tradingRoutes from '@/routes/tradingRoutes';
 import portfolioRoutes from '@/routes/portfolioRoutes';
+import socialRoutes from '@/routes/socialRoutes';
 
 const app = express();
 
@@ -47,6 +49,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/chains', chainRoutes);
 app.use('/api/trading', tradingRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/social', socialRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
