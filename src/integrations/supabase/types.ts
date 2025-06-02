@@ -231,18 +231,20 @@ export type Database = {
     }
     Functions: {
       award_points: {
-        Args: {
-          p_user_id: string
-          p_points: number
-          p_activity_type: string
-          p_description: string
-          p_chain_id?: number
-          p_transaction_hash?: string
-        }
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              p_user_id: string
+              p_points: number
+              p_activity_type: string
+              p_description: string
+              p_chain_id?: number
+              p_transaction_hash?: string
+            }
         Returns: undefined
       }
       generate_referral_code: {
-        Args: { user_id: string }
+        Args: Record<PropertyKey, never> | { user_id: string }
         Returns: string
       }
     }

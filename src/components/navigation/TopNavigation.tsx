@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -13,7 +13,12 @@ import {
   HelpCircle,
   FileText,
   Wallet,
-  Activity
+  Activity,
+  Home,
+  ArrowUpDown,
+  Plus,
+  Bridge,
+  TrendingUp
 } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAppStore } from '@/stores/useAppStore';
@@ -30,6 +35,7 @@ import { useAccount } from 'wagmi';
 import { getAllChains } from '@/lib/chains';
 import { ChainConfig } from '@/types';
 import ChainSelectorBottomSheet from './ChainSelectorBottomSheet';
+import { cn } from '@/lib/utils';
 
 const TopNavigation = () => {
   const [selectedChain, setSelectedChain] = useState<ChainConfig | null>(null);
@@ -38,6 +44,7 @@ const TopNavigation = () => {
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const { isAuthenticated } = useSupabaseIntegration();
   const { address, isConnected } = useAccount();
+  const location = useLocation();
 
   const chains = getAllChains();
 
@@ -49,19 +56,35 @@ const TopNavigation = () => {
     return `/chains/${chainName.toLowerCase().replace(/\s+/g, '-')}.svg`;
   };
 
-  const menuItems = [
-    { icon: BarChart3, label: 'STEX Points Dashboard', href: '/points' },
-    { icon: Users, label: 'Referral System (50 STEX)', href: '/referrals' },
+  // Primary navigation items for desktop
+  const primaryNavItems = [
+    { icon: Home, label: 'Dashboard', href: '/', key: 'dashboard' },
+    { icon: ArrowUpDown, label: 'Swap', href: '/swap', key: 'swap' },
+    { icon: Plus, label: 'Create', href: '/create', key: 'create' },
+    { icon: Bridge, label: 'Bridge', href: '/bridge', key: 'bridge' },
+    { icon: BarChart3, label: 'Analytics', href: '/analytics', key: 'analytics' }
+  ];
+
+  // Secondary menu items (moved to profile dropdown)
+  const secondaryMenuItems = [
+    { icon: TrendingUp, label: 'STEX Points Dashboard', href: '/points' },
+    { icon: Users, label: 'Referral System', href: '/referrals' },
     { icon: Settings, label: 'Settings', href: '/settings' },
-    { icon: BarChart3, label: 'Personal Analytics', href: '/analytics' },
     { icon: HelpCircle, label: 'Help & Support', href: '/support' },
     { icon: FileText, label: 'Documentation', href: '/docs' }
   ];
 
+  const isActivePath = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
+  };
+
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-950/95 via-slate-900/95 to-slate-950/95 backdrop-blur-sm border-b border-slate-800">
-        <div className="w-full px-2 sm:px-4 lg:px-6">
+        <div className="w-full px-4 lg:px-6">
           <div className="flex h-14 sm:h-16 items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
@@ -71,42 +94,33 @@ const TopNavigation = () => {
               <span className="hidden sm:block text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                 SCRYPTEX
               </span>
-              <Badge variant="outline" className="hidden sm:block border-emerald-500/50 text-emerald-400 text-xs">
+              <Badge variant="outline" className="hidden lg:block border-emerald-500/50 text-emerald-400 text-xs">
                 DEX
               </Badge>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6">
-              <Link
-                to="/"
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/swap"
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                Trade
-              </Link>
-              <Link
-                to="/create"
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                Create
-              </Link>
-              <Link
-                to="/bridge"
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                Bridge
-              </Link>
+            {/* Desktop Primary Navigation */}
+            <nav className="hidden lg:flex items-center space-x-1">
+              {primaryNavItems.map((item) => (
+                <Link
+                  key={item.key}
+                  to={item.href}
+                  className={cn(
+                    "flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                    isActivePath(item.href)
+                      ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20"
+                      : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
             </nav>
 
             {/* Right Actions */}
             <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-              {/* Chain Selector - Icon Only */}
+              {/* Chain Selector */}
               <div className="relative">
                 <Button
                   variant="ghost"
@@ -128,7 +142,6 @@ const TopNavigation = () => {
                   ) : null}
                   <Activity className={selectedChain ? "hidden" : "h-5 w-5 text-blue-400"} />
                   
-                  {/* Current Chain Indicator Badge */}
                   {selectedChain && (
                     <Badge className="absolute -top-1 -right-1 h-3 w-3 rounded-full p-0 bg-green-500 border-2 border-slate-900">
                       <span className="sr-only">Chain connected</span>
@@ -137,11 +150,11 @@ const TopNavigation = () => {
                 </Button>
               </div>
 
-              {/* Faucet Button */}
+              {/* Faucet Button - Desktop Only */}
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden lg:flex border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 text-xs px-2"
+                className="hidden lg:flex border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 text-xs px-3"
               >
                 <Gift className="h-3 w-3 mr-1" />
                 Faucet
@@ -177,15 +190,29 @@ const TopNavigation = () => {
                 )}
               </div>
 
-              {/* Hamburger Menu */}
+              {/* Profile Menu (Desktop) / Hamburger Menu (Mobile) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="p-2">
                     <Menu className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-slate-900 border-slate-800">
-                  {menuItems.map((item) => (
+                <DropdownMenuContent className="w-56 bg-slate-900 border-slate-800" align="end">
+                  {/* Mobile Navigation - Show primary items on mobile only */}
+                  <div className="lg:hidden">
+                    {primaryNavItems.map((item) => (
+                      <DropdownMenuItem key={`mobile-${item.key}`} asChild>
+                        <Link to={item.href} className="flex items-center text-sm">
+                          <item.icon className="h-4 w-4 mr-2" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator className="lg:hidden bg-slate-800" />
+                  </div>
+                  
+                  {/* Secondary menu items (always visible) */}
+                  {secondaryMenuItems.map((item) => (
                     <DropdownMenuItem key={item.href} asChild>
                       <Link to={item.href} className="flex items-center text-sm">
                         <item.icon className="h-4 w-4 mr-2" />
