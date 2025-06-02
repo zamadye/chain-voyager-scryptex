@@ -17,7 +17,7 @@ import {
   Home,
   ArrowUpDown,
   Plus,
-  Bridge,
+  ArrowLeftRight,
   TrendingUp
 } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -61,7 +61,7 @@ const TopNavigation = () => {
     { icon: Home, label: 'Dashboard', href: '/', key: 'dashboard' },
     { icon: ArrowUpDown, label: 'Swap', href: '/swap', key: 'swap' },
     { icon: Plus, label: 'Create', href: '/create', key: 'create' },
-    { icon: Bridge, label: 'Bridge', href: '/bridge', key: 'bridge' },
+    { icon: ArrowLeftRight, label: 'Bridge', href: '/bridge', key: 'bridge' },
     { icon: BarChart3, label: 'Analytics', href: '/analytics', key: 'analytics' }
   ];
 
