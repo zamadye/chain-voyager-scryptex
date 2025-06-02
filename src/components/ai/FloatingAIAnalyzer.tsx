@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Brain, TrendingUp, X, Minimize2, Maximize2 } from 'lucide-react';
-import ProjectAnalysisForm from './ProjectAnalysisForm';
+import { Brain, TrendingUp, X, Minimize2, Maximize2, Zap, Users, DollarSign } from 'lucide-react';
+import ProjectChainAnalysis from './ProjectChainAnalysis';
 import MarketAnalysis from './MarketAnalysis';
 import CryptoNews from './CryptoNews';
 
@@ -18,7 +18,7 @@ const FloatingAIAnalyzer = () => {
       <div className="fixed bottom-20 right-6 z-50 md:bottom-6">
         <Button
           onClick={() => setIsOpen(true)}
-          className="h-14 w-14 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg"
+          className="h-14 w-14 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg animate-pulse"
           size="icon"
         >
           <Brain className="h-6 w-6" />
@@ -35,7 +35,7 @@ const FloatingAIAnalyzer = () => {
         <CardHeader className="flex flex-row items-center justify-between p-4">
           <div className="flex items-center space-x-2">
             <Brain className="h-5 w-5 text-purple-400" />
-            <CardTitle className="text-white text-sm">AI Market Analyzer</CardTitle>
+            <CardTitle className="text-white text-sm">SCRYPTEX AI Expert</CardTitle>
             <Badge variant="outline" className="border-green-500/50 text-green-400 text-xs">
               LIVE
             </Badge>
@@ -62,16 +62,16 @@ const FloatingAIAnalyzer = () => {
 
         {!isMinimized && (
           <CardContent className="p-0 h-full overflow-hidden">
-            <Tabs defaultValue="project" className="h-full flex flex-col">
+            <Tabs defaultValue="chains" className="h-full flex flex-col">
               <TabsList className="grid w-full grid-cols-3 bg-slate-800 mx-4 mb-2">
-                <TabsTrigger value="project" className="text-xs">Project</TabsTrigger>
+                <TabsTrigger value="chains" className="text-xs">Chains</TabsTrigger>
                 <TabsTrigger value="market" className="text-xs">Market</TabsTrigger>
                 <TabsTrigger value="news" className="text-xs">News</TabsTrigger>
               </TabsList>
               
               <div className="flex-1 overflow-hidden px-4 pb-4">
-                <TabsContent value="project" className="h-full m-0">
-                  <ProjectAnalysisForm />
+                <TabsContent value="chains" className="h-full m-0">
+                  <ProjectChainAnalysis />
                 </TabsContent>
                 
                 <TabsContent value="market" className="h-full m-0">

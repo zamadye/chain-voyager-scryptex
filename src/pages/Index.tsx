@@ -5,7 +5,7 @@ import VolumeChart from '@/components/dashboard/VolumeChart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Activity, TrendingUp, Users, Zap, ArrowUpDown, Plus } from 'lucide-react';
+import { Activity, TrendingUp, Users, Zap, ArrowUpDown, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -42,10 +42,10 @@ const Index = () => {
                   Start Trading
                 </Button>
               </Link>
-              <Link to="/create" className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full sm:w-auto border-slate-600 text-slate-300 hover:bg-slate-800 h-12 px-8 text-base font-semibold">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Create Token
+              <Link to="/points" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 h-12 px-8 text-base font-semibold">
+                  <Gift className="h-5 w-5 mr-2" />
+                  Airdrop Tasks
                 </Button>
               </Link>
             </div>
