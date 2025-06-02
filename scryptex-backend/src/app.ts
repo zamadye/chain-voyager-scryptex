@@ -11,6 +11,8 @@ import healthRoutes from './routes/health';
 
 // Import new routes
 import chainRoutes from '@/routes/chainRoutes';
+import tradingRoutes from '@/routes/tradingRoutes';
+import portfolioRoutes from '@/routes/portfolioRoutes';
 
 const app = express();
 
@@ -42,7 +44,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/health', healthRoutes);
-app.use('/api/chains', chainRoutes); // Add new chain routes
+app.use('/api/chains', chainRoutes);
+app.use('/api/trading', tradingRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

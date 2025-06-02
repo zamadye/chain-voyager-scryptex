@@ -1,7 +1,8 @@
+
 {
   "name": "scryptex-backend",
   "version": "1.0.0",
-  "description": "SCRYPTEX Multi-Chain DEX and Token Creation Platform Backend - Phase 1",
+  "description": "SCRYPTEX Multi-Chain DEX and Token Creation Platform Backend - Phase 3",
   "main": "dist/app.js",
   "engines": {
     "node": ">=18.0.0",
@@ -37,7 +38,9 @@
     "swagger:generate": "swagger-jsdoc -d swaggerDef.js src/routes/*.ts -o swagger.json",
     "chain:health": "node dist/scripts/healthCheck.js",
     "chain:optimize": "node dist/scripts/optimizeChains.js",
-    "chain:monitor": "node dist/scripts/monitorPerformance.js"
+    "chain:monitor": "node dist/scripts/monitorPerformance.js",
+    "trading:backtest": "node dist/scripts/backtestStrategies.js",
+    "trading:arbitrage": "node dist/scripts/detectArbitrage.js"
   },
   "keywords": [
     "blockchain",
@@ -49,7 +52,10 @@
     "api",
     "backend",
     "typescript",
-    "express"
+    "express",
+    "trading",
+    "portfolio",
+    "cross-chain"
   ],
   "author": "SCRYPTEX Team",
   "license": "MIT",
@@ -80,7 +86,21 @@
     "@somnia/dreamchain-sdk": "latest",
     "@risechain/parallel-sdk": "latest",
     "@megaeth/realtime-sdk": "latest",
-    "@pharos/rwa-sdk": "latest"
+    "@pharos/rwa-sdk": "latest",
+    "ccxt": "^4.1.0",
+    "bull": "^4.12.0",
+    "ws": "^8.14.0",
+    "socket.io": "^4.7.0",
+    "simple-statistics": "^7.8.0",
+    "ml-matrix": "^6.10.0",
+    "brain.js": "^2.0.0-beta.20",
+    "influxdb-client": "^1.33.0",
+    "decimal.js": "^10.4.3",
+    "bignumber.js": "^9.1.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "axios": "^1.6.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
@@ -98,6 +118,8 @@
     "@types/multer": "^1.4.11",
     "@types/jest": "^29.5.8",
     "@types/supertest": "^2.0.16",
+    "@types/ws": "^8.5.0",
+    "@types/lodash": "^4.14.0",
     "typescript": "^5.3.3",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.8",
