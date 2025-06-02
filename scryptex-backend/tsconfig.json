@@ -23,6 +23,16 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "useUnknownInCatchVariables": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],
@@ -34,17 +44,22 @@
       "@/routes/*": ["./routes/*"],
       "@/utils/*": ["./utils/*"],
       "@/types/*": ["./types/*"],
-      "@/validators/*": ["./validators/*"],
-      "@/jobs/*": ["./jobs/*"]
+      "@/validators/*": ["./validators/*"]
     }
   },
   "include": [
-    "src/**/*",
-    "prisma/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "tests"
-  ]
+    "coverage",
+    "logs",
+    "tests",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }

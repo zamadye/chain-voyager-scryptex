@@ -2,49 +2,74 @@
 {
   "name": "scryptex-backend",
   "version": "1.0.0",
-  "description": "SCRYPTEX Multi-Chain Airdrop Farming Platform Backend",
+  "description": "SCRYPTEX Multi-Chain DEX and Token Creation Platform Backend - Phase 1",
   "main": "dist/app.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
-    "dev": "nodemon src/app.ts",
-    "build": "tsc",
+    "dev": "nodemon --exec ts-node src/app.ts",
+    "build": "tsc && tsc-alias",
     "start": "node dist/app.js",
-    "test": "jest",
+    "start:prod": "NODE_ENV=production node dist/app.js",
+    "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "lint": "eslint src/**/*.ts --fix",
+    "lint:check": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "typecheck": "tsc --noEmit",
+    "migrate": "node scripts/migrate.js",
+    "migrate:rollback": "node scripts/rollback.js",
+    "seed": "node scripts/seed.js",
+    "db:reset": "npm run migrate:rollback && npm run migrate && npm run seed",
     "docker:build": "docker build -t scryptex-backend .",
-    "docker:run": "docker run -p 3000:3000 scryptex-backend"
+    "docker:run": "docker run -p 3000:3000 --env-file .env scryptex-backend",
+    "docker:dev": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "clean": "rimraf dist coverage logs",
+    "prepare": "husky install",
+    "precommit": "lint-staged",
+    "health:check": "curl -f http://localhost:3000/health || exit 1",
+    "swagger:generate": "swagger-jsdoc -d swaggerDef.js src/routes/*.ts -o swagger.json"
   },
+  "keywords": [
+    "blockchain",
+    "defi",
+    "dex",
+    "token",
+    "ethereum",
+    "web3",
+    "api",
+    "backend",
+    "typescript",
+    "express"
+  ],
+  "author": "SCRYPTEX Team",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
     "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
     "express-rate-limit": "^7.1.5",
-    "@prisma/client": "^5.7.1",
-    "prisma": "^5.7.1",
-    "redis": "^4.6.12",
-    "bull": "^4.12.0",
+    "pg": "^8.11.3",
+    "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
-    "zod": "^3.22.4",
-    "viem": "^2.1.1",
+    "ethers": "^5.7.2",
+    "joi": "^17.11.0",
     "winston": "^3.11.0",
-    "prom-client": "^15.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "dotenv": "^16.3.1",
-    "nodemailer": "^6.9.7",
-    "multer": "^1.4.5-lts.1",
-    "express-validator": "^7.0.1",
-    "axios": "^1.6.2",
-    "cron": "^3.1.6"
+    "uuid": "^9.0.1",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
@@ -52,25 +77,81 @@
     "@types/cors": "^2.8.17",
     "@types/morgan": "^1.9.9",
     "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.6",
     "@types/jsonwebtoken": "^9.0.5",
-    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.10.9",
+    "@types/joi": "^17.2.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
-    "@types/nodemailer": "^6.4.14",
+    "@types/uuid": "^9.0.7",
     "@types/multer": "^1.4.11",
     "@types/jest": "^29.5.8",
     "@types/supertest": "^2.0.16",
     "typescript": "^5.3.3",
     "ts-node": "^10.9.1",
-    "tsx": "^4.6.2",
+    "tsc-alias": "^1.8.8",
     "nodemon": "^3.0.2",
     "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
     "supertest": "^6.3.3",
     "eslint": "^8.55.0",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2"
+    "@typescript-eslint/parser": "^6.13.2",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "rimraf": "^5.0.5"
   },
-  "engines": {
-    "node": ">=18.0.0"
+  "lint-staged": {
+    "src/**/*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.ts",
+      "**/src/**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/app.ts",
+      "!src/types/**/*"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "ts,js,json",
+    "ignore": [
+      "src/**/*.test.ts",
+      "coverage/**/*",
+      "dist/**/*",
+      "logs/**/*"
+    ],
+    "env": {
+      "NODE_ENV": "development"
+    }
   }
 }
