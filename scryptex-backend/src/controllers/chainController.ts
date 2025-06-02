@@ -1,214 +1,457 @@
 
-import { Request, Response, NextFunction } from 'express';
-import { chainService } from '@/services/chainService';
+import { Request, Response } from 'express';
+import { chainManagementService } from '@/services/chainManagementService';
+import { enhancedWeb3Service } from '@/services/enhancedWeb3Service';
+import { blockchainProviderService } from '@/services/blockchainProviderService';
 import { logger } from '@/utils/logger';
-import { ApiResponse } from '@/utils/response';
-import { RequestWithId } from '@/middleware/requestLogger';
+import { asyncHandler } from '@/middleware/errorHandler';
 
+/**
+ * Enhanced chain controller for multi-chain operations
+ */
 export class ChainController {
   /**
-   * Get all supported chains
+   * Get all supported chains with their configurations
    */
-  static async getAllChains(req: RequestWithId, res: Response, next: NextFunction) {
+  getAllChains = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { includeInactive = false } = req.query;
+    
     try {
-      const { includeInactive = false } = req.query;
+      const chains = await chainManagementService.getAllChains(
+        includeInactive === 'true'
+      );
       
-      const chains = await chainService.getAllChains({
-        includeInactive: includeInactive === 'true'
+      res.json({
+        success: true,
+        data: {
+          chains,
+          totalCount: chains.length,
+          activeCount: chains.filter(c => c.isActive).length
+        }
       });
-
-      logger.info('Chains retrieved successfully', {
-        requestId: req.requestId,
-        count: chains.length
-      });
-
-      return ApiResponse.success(res, chains, 'Chains retrieved successfully');
+      
     } catch (error) {
-      logger.error('Error retrieving chains', {
-        requestId: req.requestId,
+      logger.error('Failed to get all chains', {
         error: error instanceof Error ? error.message : 'Unknown error'
       });
-      next(error);
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve chains'
+      });
     }
-  }
+  });
 
   /**
    * Get specific chain details
    */
-  static async getChainById(req: RequestWithId, res: Response, next: NextFunction) {
+  getChainById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { chainId } = req.params;
+    
     try {
-      const { chainId } = req.params;
+      const chain = await chainManagementService.getChainById(parseInt(chainId));
       
-      const chain = await chainService.getChainById(Number(chainId));
-
       if (!chain) {
-        return ApiResponse.error(res, 'Chain not found', 404);
+        res.status(404).json({
+          success: false,
+          error: 'Chain not found'
+        });
+        return;
       }
-
-      logger.info('Chain details retrieved successfully', {
-        requestId: req.requestId,
-        chainId
-      });
-
-      return ApiResponse.success(res, chain, 'Chain details retrieved successfully');
-    } catch (error) {
-      logger.error('Error retrieving chain details', {
-        requestId: req.requestId,
-        chainId: req.params.chainId,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-
-  /**
-   * Get chain status and health
-   */
-  static async getChainStatus(req: RequestWithId, res: Response, next: NextFunction) {
-    try {
-      const { chainId } = req.params;
       
-      const status = await chainService.getChainStatus(Number(chainId));
-
-      if (!status) {
-        return ApiResponse.error(res, 'Chain status not available', 404);
-      }
-
-      logger.info('Chain status retrieved successfully', {
-        requestId: req.requestId,
-        chainId,
-        isHealthy: status.isHealthy
-      });
-
-      return ApiResponse.success(res, status, 'Chain status retrieved successfully');
-    } catch (error) {
-      logger.error('Error retrieving chain status', {
-        requestId: req.requestId,
-        chainId: req.params.chainId,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-
-  /**
-   * Get current gas price for chain
-   */
-  static async getGasPrice(req: RequestWithId, res: Response, next: NextFunction) {
-    try {
-      const { chainId } = req.params;
+      // Get additional real-time data
+      const [health, metrics] = await Promise.all([
+        chainManagementService.getChainHealth(parseInt(chainId)),
+        blockchainProviderService.getChainMetrics(parseInt(chainId))
+      ]);
       
-      const gasPrice = await chainService.getCurrentGasPrice(Number(chainId));
-
-      logger.info('Gas price retrieved successfully', {
-        requestId: req.requestId,
-        chainId,
-        gasPrice: gasPrice.standard
+      res.json({
+        success: true,
+        data: {
+          ...chain,
+          health,
+          metrics
+        }
       });
-
-      return ApiResponse.success(res, gasPrice, 'Gas price retrieved successfully');
-    } catch (error) {
-      logger.error('Error retrieving gas price', {
-        requestId: req.requestId,
-        chainId: req.params.chainId,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-
-  /**
-   * Get supported tokens for chain
-   */
-  static async getChainTokens(req: RequestWithId, res: Response, next: NextFunction) {
-    try {
-      const { chainId } = req.params;
       
-      const tokens = await chainService.getSupportedTokens(Number(chainId));
-
-      logger.info('Chain tokens retrieved successfully', {
-        requestId: req.requestId,
-        chainId,
-        count: tokens.length
-      });
-
-      return ApiResponse.success(res, tokens, 'Chain tokens retrieved successfully');
     } catch (error) {
-      logger.error('Error retrieving chain tokens', {
-        requestId: req.requestId,
-        chainId: req.params.chainId,
+      logger.error('Failed to get chain by ID', {
+        chainId,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
-      next(error);
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve chain details'
+      });
     }
-  }
+  });
 
   /**
-   * Update user chain preferences
+   * Get comprehensive chain status and health
    */
-  static async updateUserChainPreference(req: RequestWithId, res: Response, next: NextFunction) {
+  getChainStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { chainId } = req.params;
+    
     try {
-      const { chainId } = req.params;
-      const { isActive, priorityOrder } = req.body;
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        return ApiResponse.error(res, 'User not authenticated', 401);
+      const [health, metrics, provider] = await Promise.all([
+        chainManagementService.getChainHealth(parseInt(chainId)),
+        blockchainProviderService.getChainMetrics(parseInt(chainId)),
+        blockchainProviderService.getProvider(parseInt(chainId))
+      ]);
+      
+      if (!provider) {
+        res.status(404).json({
+          success: false,
+          error: 'Chain provider not available'
+        });
+        return;
       }
-
-      const preference = await chainService.updateUserChainPreference({
-        userId,
-        chainId: Number(chainId),
-        isActive,
-        priorityOrder
+      
+      // Get real-time blockchain data
+      const [blockNumber, balance] = await Promise.all([
+        provider.getBlockNumber(),
+        provider.getBalance('0x0000000000000000000000000000000000000000') // Zero address for testing
+      ]);
+      
+      res.json({
+        success: true,
+        data: {
+          chainId: parseInt(chainId),
+          health,
+          metrics,
+          blockchain: {
+            latestBlock: blockNumber,
+            isConnected: provider.isConnected
+          },
+          timestamp: new Date().toISOString()
+        }
       });
-
-      logger.info('User chain preference updated', {
-        requestId: req.requestId,
-        userId,
-        chainId,
-        isActive
-      });
-
-      return ApiResponse.success(res, preference, 'Chain preference updated successfully');
+      
     } catch (error) {
-      logger.error('Error updating chain preference', {
-        requestId: req.requestId,
-        chainId: req.params.chainId,
+      logger.error('Failed to get chain status', {
+        chainId,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
-      next(error);
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve chain status'
+      });
     }
-  }
+  });
 
   /**
-   * Get user's active chains
+   * Get current gas prices for chain
    */
-  static async getUserChains(req: RequestWithId, res: Response, next: NextFunction) {
+  getGasPrice = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { chainId } = req.params;
+    const { urgency = 'standard' } = req.query;
+    
     try {
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        return ApiResponse.error(res, 'User not authenticated', 401);
+      const provider = await blockchainProviderService.getProvider(parseInt(chainId));
+      
+      if (!provider) {
+        res.status(404).json({
+          success: false,
+          error: 'Chain provider not available'
+        });
+        return;
       }
-
-      const userChains = await chainService.getUserChains(userId);
-
-      logger.info('User chains retrieved successfully', {
-        requestId: req.requestId,
-        userId,
-        count: userChains.length
+      
+      // Get gas prices for different urgency levels
+      const [slow, standard, fast, fastest] = await Promise.all([
+        provider.getOptimalGasPrice('slow'),
+        provider.getOptimalGasPrice('standard'),
+        provider.getOptimalGasPrice('fast'),
+        provider.getOptimalGasPrice('fastest')
+      ]);
+      
+      res.json({
+        success: true,
+        data: {
+          chainId: parseInt(chainId),
+          gasPrice: {
+            slow,
+            standard,
+            fast,
+            fastest
+          },
+          recommended: urgency === 'slow' ? slow : 
+                      urgency === 'fast' ? fast :
+                      urgency === 'fastest' ? fastest : standard,
+          timestamp: new Date().toISOString()
+        }
       });
-
-      return ApiResponse.success(res, userChains, 'User chains retrieved successfully');
+      
     } catch (error) {
-      logger.error('Error retrieving user chains', {
-        requestId: req.requestId,
+      logger.error('Failed to get gas price', {
+        chainId,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
-      next(error);
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve gas price'
+      });
     }
-  }
+  });
+
+  /**
+   * Compare performance across multiple chains
+   */
+  compareChains = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { chainIds } = req.body;
+    
+    if (!Array.isArray(chainIds) || chainIds.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid chain IDs provided'
+      });
+      return;
+    }
+    
+    try {
+      const comparison = await chainManagementService.compareChainPerformance(
+        chainIds.map((id: any) => parseInt(id))
+      );
+      
+      res.json({
+        success: true,
+        data: comparison
+      });
+      
+    } catch (error) {
+      logger.error('Failed to compare chains', {
+        chainIds,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to compare chain performance'
+      });
+    }
+  });
+
+  /**
+   * Get optimal chain recommendation for operation
+   */
+  getOptimalChain = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { 
+      latency = 5000, 
+      throughput = 100, 
+      cost = 'medium',
+      features = [],
+      compliance = false
+    } = req.body;
+    
+    try {
+      const requirements = {
+        latency: parseInt(latency),
+        throughput: parseInt(throughput),
+        cost,
+        features: Array.isArray(features) ? features : [],
+        compliance
+      };
+      
+      const recommendation = await enhancedWeb3Service.getOptimalChainRecommendation(requirements);
+      
+      res.json({
+        success: true,
+        data: {
+          recommendation,
+          requirements,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+    } catch (error) {
+      logger.error('Failed to get optimal chain recommendation', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get chain recommendation'
+      });
+    }
+  });
+
+  /**
+   * Get real-time metrics for all chains
+   */
+  getAllMetrics = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    try {
+      const allMetrics = await chainManagementService.getAllChainMetrics();
+      
+      const metricsArray = Array.from(allMetrics.entries()).map(([chainId, metrics]) => ({
+        chainId,
+        ...metrics
+      }));
+      
+      res.json({
+        success: true,
+        data: {
+          metrics: metricsArray,
+          summary: {
+            totalChains: metricsArray.length,
+            healthyChains: metricsArray.filter(m => m.healthScore > 80).length,
+            averageLatency: metricsArray.reduce((sum, m) => sum + m.actualLatency, 0) / metricsArray.length,
+            totalThroughput: metricsArray.reduce((sum, m) => sum + m.currentTPS, 0)
+          },
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+    } catch (error) {
+      logger.error('Failed to get all metrics', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve metrics'
+      });
+    }
+  });
+
+  /**
+   * Optimize chain configuration
+   */
+  optimizeChain = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { chainId } = req.params;
+    
+    try {
+      const optimizations = await chainManagementService.optimizeChainConfiguration(
+        parseInt(chainId)
+      );
+      
+      res.json({
+        success: true,
+        data: {
+          chainId: parseInt(chainId),
+          optimizations,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+    } catch (error) {
+      logger.error('Failed to optimize chain', {
+        chainId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to optimize chain configuration'
+      });
+    }
+  });
+
+  /**
+   * Test chain connectivity and performance
+   */
+  testChain = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { chainId } = req.params;
+    const { operations = ['connectivity', 'gas', 'performance'] } = req.body;
+    
+    try {
+      const startTime = Date.now();
+      const provider = await blockchainProviderService.getProvider(parseInt(chainId));
+      
+      if (!provider) {
+        res.status(404).json({
+          success: false,
+          error: 'Chain provider not available'
+        });
+        return;
+      }
+      
+      const testResults: any = {
+        chainId: parseInt(chainId),
+        tests: {},
+        totalTime: 0,
+        success: true
+      };
+      
+      // Connectivity test
+      if (operations.includes('connectivity')) {
+        const connectivityStart = Date.now();
+        try {
+          const blockNumber = await provider.getBlockNumber();
+          testResults.tests.connectivity = {
+            success: true,
+            blockNumber,
+            latency: Date.now() - connectivityStart
+          };
+        } catch (error) {
+          testResults.tests.connectivity = {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            latency: Date.now() - connectivityStart
+          };
+          testResults.success = false;
+        }
+      }
+      
+      // Gas price test
+      if (operations.includes('gas')) {
+        const gasStart = Date.now();
+        try {
+          const gasPrice = await provider.getOptimalGasPrice('standard');
+          testResults.tests.gas = {
+            success: true,
+            gasPrice,
+            latency: Date.now() - gasStart
+          };
+        } catch (error) {
+          testResults.tests.gas = {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            latency: Date.now() - gasStart
+          };
+        }
+      }
+      
+      // Performance test
+      if (operations.includes('performance')) {
+        const perfStart = Date.now();
+        try {
+          const metrics = await blockchainProviderService.getChainMetrics(parseInt(chainId));
+          testResults.tests.performance = {
+            success: true,
+            metrics,
+            latency: Date.now() - perfStart
+          };
+        } catch (error) {
+          testResults.tests.performance = {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            latency: Date.now() - perfStart
+          };
+        }
+      }
+      
+      testResults.totalTime = Date.now() - startTime;
+      
+      res.json({
+        success: true,
+        data: testResults
+      });
+      
+    } catch (error) {
+      logger.error('Failed to test chain', {
+        chainId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to test chain'
+      });
+    }
+  });
 }
 
-export default ChainController;
+export const chainController = new ChainController();
