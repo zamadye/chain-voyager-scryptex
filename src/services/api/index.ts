@@ -1,9 +1,23 @@
 
-export { authService, type AuthCredentials, type User, type AuthResponse } from './authService';
-export { chainService, type ChainInfo, type DeploymentRequest, type DeploymentResult } from './chainService';
-export { tradingService, type SwapRequest, type SwapQuote, type TradingOrder, type Portfolio } from './tradingService';
-export { socialService, type SocialPost, type TraderProfile, type Competition, type ReferralData } from './socialService';
-export { enterpriseService, type InstitutionalAccount, type ComplianceResult, type QuantStrategy, type ExecutiveDashboard } from './enterpriseService';
+import { authService } from './authService';
+import { chainService } from './chainService';
+import { tradingService } from './tradingService';
+import { socialService } from './socialService';
+import { enterpriseService } from './enterpriseService';
+
+// Export individual services
+export { authService } from './authService';
+export { chainService } from './chainService';
+export { tradingService } from './tradingService';
+export { socialService } from './socialService';
+export { enterpriseService } from './enterpriseService';
+
+// Export types
+export type { AuthCredentials, User, AuthResponse } from './authService';
+export type { ChainInfo, DeploymentRequest, DeploymentResult } from './chainService';
+export type { SwapRequest, SwapQuote, TradingOrder, Portfolio } from './tradingService';
+export type { SocialPost, TraderProfile, Competition, ReferralData } from './socialService';
+export type { InstitutionalAccount, ComplianceResult, QuantStrategy, ExecutiveDashboard } from './enterpriseService';
 
 // Unified API client
 export class APIClient {

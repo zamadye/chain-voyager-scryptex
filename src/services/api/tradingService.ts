@@ -50,6 +50,13 @@ export interface Position {
   unrealizedPnL: string;
 }
 
+export interface ComplianceResult {
+  isCompliant: boolean;
+  violations: any[];
+  riskScore: number;
+  requiredActions: any[];
+}
+
 export class TradingService {
   async getSwapQuote(request: SwapRequest) {
     return mockApi.post<SwapQuote>('/api/trading/quote', request);
@@ -82,6 +89,10 @@ export class TradingService {
 
   async bridgeAssets(request: any) {
     return mockApi.post('/api/trading/bridge', request);
+  }
+
+  async checkTradeCompliance(tradeData: any) {
+    return mockApi.post<ComplianceResult>('/api/compliance/check-trade', { tradeData });
   }
 }
 
