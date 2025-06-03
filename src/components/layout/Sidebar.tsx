@@ -1,10 +1,9 @@
-
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   Home, Shuffle, Repeat, BarChart3, History, User, Settings,
   Gift, UserPlus, Coins, Sun, FileText, HelpCircle, Building2,
-  Layers, Wrench, Zap
+  Layers, Wrench, Zap, ArrowLeftRight
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -14,7 +13,7 @@ const Sidebar = () => {
     { name: 'Create', href: '/create', icon: Wrench },
     { name: 'Deploy', href: '/deploy', icon: Zap },
     { name: 'Swap', href: '/swap', icon: Repeat },
-    { name: 'Bridge', href: '/bridge', icon: Shuffle },
+    { name: 'Bridge', href: '/bridge', icon: ArrowLeftRight, badge: 'NEW', description: 'Cross-chain asset bridging with point rewards' },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'History', href: '/history', icon: History },
   ];

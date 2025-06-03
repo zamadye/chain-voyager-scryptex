@@ -1,70 +1,138 @@
 
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
-import { v4 as uuidv4 } from 'uuid';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import { config } from './config/environment';
 import { logger } from './utils/logger';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import authRoutes from './routes/auth';
-import healthRoutes from './routes/health';
+import { databaseService } from './services/DatabaseService';
 
-// Import all phase routes
-import chainRoutes from '@/routes/chainRoutes';
-import tradingRoutes from '@/routes/tradingRoutes';
-import portfolioRoutes from '@/routes/portfolioRoutes';
-import socialRoutes from '@/routes/socialRoutes';
-import enterpriseRoutes from '@/routes/enterpriseRoutes';
+// Import route handlers
+import authRoutes from './routes/authRoutes';
+import chainRoutes from './routes/chainRoutes';
+import bridgeRoutes from './routes/bridgeRoutes';
+import enterpriseRoutes from './routes/enterpriseRoutes';
 
 const app = express();
 
-// Enable CORS
+// Security middleware
+app.use(helmet());
 app.use(cors({
   origin: config.cors.origin,
-  credentials: config.cors.credentials,
-  methods: config.cors.methods,
+  credentials: true
 }));
 
-// Set security HTTP headers
-app.use(helmet());
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use(limiter);
 
-// Request logger
-app.use(morgan('dev'));
+// Body parsing middleware
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Parse JSON request body
-app.use(express.json({ limit: '5mb' }));
-
-// Parse URL-encoded request body
-app.use(express.urlencoded({ extended: true }));
-
-// Add request ID
-app.use((req: Request, res: Response, next: NextFunction) => {
-  req.id = uuidv4();
+// Logging middleware
+app.use((req, res, next) => {
+  logger.info('HTTP Request', {
+    method: req.method,
+    url: req.url,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  });
   next();
 });
 
-// API Routes - All 5 Phases
-app.use('/api/auth', authRoutes);
-app.use('/api/health', healthRoutes);
+// Health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    const dbHealth = await databaseService.healthCheck();
+    
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: dbHealth ? 'healthy' : 'unhealthy',
+        api: 'healthy'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
 
-// Phase 2: Multi-Chain Infrastructure
-app.use('/api/chains', chainRoutes);
+// API routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/chains', chainRoutes);
+app.use('/api/v1/bridge', bridgeRoutes);
+app.use('/api/v1/enterprise', enterpriseRoutes);
 
-// Phase 3: Advanced Trading Engine
-app.use('/api/trading', tradingRoutes);
-app.use('/api/portfolio', portfolioRoutes);
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Route not found',
+    path: req.originalUrl
+  });
+});
 
-// Phase 4: Social Trading Platform
-app.use('/api/social', socialRoutes);
+// Global error handler
+app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  logger.error('Unhandled error', {
+    error: error.message,
+    stack: error.stack,
+    url: req.url,
+    method: req.method
+  });
 
-// Phase 5: Enterprise & Institutional Platform
-app.use('/api/enterprise', enterpriseRoutes);
+  res.status(error.status || 500).json({
+    success: false,
+    error: config.node.env === 'production' ? 'Internal server error' : error.message,
+    ...(config.node.env !== 'production' && { stack: error.stack })
+  });
+});
 
-// Error handling middleware
-app.use(errorHandler);
+const PORT = config.server.port || 3000;
 
-// Not found route
-app.use(notFoundHandler);
+// Initialize database and start server
+async function startServer() {
+  try {
+    await databaseService.initialize();
+    
+    app.listen(PORT, () => {
+      logger.info(`SCRYPTEX Backend Phase 3 server running on port ${PORT}`);
+      logger.info(`Environment: ${config.node.env}`);
+      logger.info('Cross-Chain Bridge Platform with Point Rewards - Ready');
+    });
+  } catch (error) {
+    logger.error('Failed to start server', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    process.exit(1);
+  }
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  await databaseService.close();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  await databaseService.close();
+  process.exit(0);
+});
+
+startServer();
 
 export default app;
