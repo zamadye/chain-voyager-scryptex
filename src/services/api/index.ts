@@ -1,3 +1,4 @@
+
 import { authService } from './authService';
 import { chainService } from './chainService';
 import { tradingService } from './tradingService';
@@ -28,7 +29,8 @@ export type {
   BridgeLeaderboardEntry,
   DailyBridgeTask,
   UserTaskProgress,
-  BridgeAnalytics
+  BridgeAnalytics,
+  BridgeQuoteResponse
 } from './bridgeService';
 
 // Unified API client
