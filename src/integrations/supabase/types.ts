@@ -189,6 +189,77 @@ export type Database = {
           },
         ]
       }
+      bonding_curve_analytics: {
+        Row: {
+          all_time_high: number | null
+          all_time_low: number | null
+          created_at: string | null
+          current_price: number | null
+          current_supply: number | null
+          curve_address: string
+          curve_innovation_score: number | null
+          curve_parameters: Json
+          curve_type: string
+          id: string
+          last_updated: string | null
+          market_cap: number | null
+          mathematical_complexity: number | null
+          price_volatility: number | null
+          token_deployment_id: string
+          total_buy_transactions: number | null
+          total_sell_transactions: number | null
+          total_volume: number | null
+        }
+        Insert: {
+          all_time_high?: number | null
+          all_time_low?: number | null
+          created_at?: string | null
+          current_price?: number | null
+          current_supply?: number | null
+          curve_address: string
+          curve_innovation_score?: number | null
+          curve_parameters: Json
+          curve_type: string
+          id?: string
+          last_updated?: string | null
+          market_cap?: number | null
+          mathematical_complexity?: number | null
+          price_volatility?: number | null
+          token_deployment_id: string
+          total_buy_transactions?: number | null
+          total_sell_transactions?: number | null
+          total_volume?: number | null
+        }
+        Update: {
+          all_time_high?: number | null
+          all_time_low?: number | null
+          created_at?: string | null
+          current_price?: number | null
+          current_supply?: number | null
+          curve_address?: string
+          curve_innovation_score?: number | null
+          curve_parameters?: Json
+          curve_type?: string
+          id?: string
+          last_updated?: string | null
+          market_cap?: number | null
+          mathematical_complexity?: number | null
+          price_volatility?: number | null
+          token_deployment_id?: string
+          total_buy_transactions?: number | null
+          total_sell_transactions?: number | null
+          total_volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonding_curve_analytics_token_deployment_id_fkey"
+            columns: ["token_deployment_id"]
+            isOneToOne: false
+            referencedRelation: "token_deployments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competition_participants: {
         Row: {
           competition_id: string
@@ -434,6 +505,111 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      creation_achievements: {
+        Row: {
+          achievement_category: string
+          achievement_description: string
+          achievement_id: string
+          achievement_name: string
+          achievement_points: number
+          badge_icon: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          requirement_condition: string | null
+          requirement_type: string
+          requirement_value: number
+          special_privilege: string | null
+        }
+        Insert: {
+          achievement_category: string
+          achievement_description: string
+          achievement_id: string
+          achievement_name: string
+          achievement_points: number
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          requirement_condition?: string | null
+          requirement_type: string
+          requirement_value: number
+          special_privilege?: string | null
+        }
+        Update: {
+          achievement_category?: string
+          achievement_description?: string
+          achievement_id?: string
+          achievement_name?: string
+          achievement_points?: number
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          requirement_condition?: string | null
+          requirement_type?: string
+          requirement_value?: number
+          special_privilege?: string | null
+        }
+        Relationships: []
+      }
+      daily_creation_tasks: {
+        Row: {
+          bonus_multiplier: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          minimum_innovation_score: number | null
+          required_chains: string[] | null
+          required_features: string[] | null
+          required_token_types: string[] | null
+          required_tokens: number | null
+          special_reward: string | null
+          task_date: string
+          task_description: string
+          task_id: string
+          task_name: string
+          task_points: number
+          task_type: string
+        }
+        Insert: {
+          bonus_multiplier?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          minimum_innovation_score?: number | null
+          required_chains?: string[] | null
+          required_features?: string[] | null
+          required_token_types?: string[] | null
+          required_tokens?: number | null
+          special_reward?: string | null
+          task_date?: string
+          task_description: string
+          task_id: string
+          task_name: string
+          task_points: number
+          task_type: string
+        }
+        Update: {
+          bonus_multiplier?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          minimum_innovation_score?: number | null
+          required_chains?: string[] | null
+          required_features?: string[] | null
+          required_token_types?: string[] | null
+          required_tokens?: number | null
+          special_reward?: string | null
+          task_date?: string
+          task_description?: string
+          task_id?: string
+          task_name?: string
+          task_points?: number
+          task_type?: string
+        }
+        Relationships: []
       }
       daily_tasks: {
         Row: {
@@ -1384,6 +1560,135 @@ export type Database = {
           },
         ]
       }
+      token_deployments: {
+        Row: {
+          advanced_features: Json | null
+          base_points: number | null
+          bonding_curve_type: string | null
+          chain_bonus: number | null
+          chain_id: number
+          chain_name: string
+          complexity_bonus: number | null
+          creator_address: string
+          creator_token_count: number | null
+          curve_parameters: Json | null
+          daily_tasks_completed: string[] | null
+          decimals: number | null
+          deployed_at: string | null
+          deployment_fee: number
+          deployment_status: string | null
+          deployment_tx_hash: string | null
+          factory_address: string
+          feature_bonus: number | null
+          features: Json | null
+          gas_fee: number | null
+          id: string
+          initiated_at: string | null
+          innovation_score: number | null
+          innovative_features: string[] | null
+          is_first_token_today: boolean | null
+          optimization_features: Json | null
+          point_calculation_details: Json | null
+          points_awarded: number | null
+          points_calculated: boolean | null
+          token_address: string | null
+          token_description: string | null
+          token_name: string
+          token_symbol: string
+          token_type: string
+          total_cost: number | null
+          total_supply: number
+          type_bonus: number | null
+          verification_fee: number | null
+          verification_status: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          advanced_features?: Json | null
+          base_points?: number | null
+          bonding_curve_type?: string | null
+          chain_bonus?: number | null
+          chain_id: number
+          chain_name: string
+          complexity_bonus?: number | null
+          creator_address: string
+          creator_token_count?: number | null
+          curve_parameters?: Json | null
+          daily_tasks_completed?: string[] | null
+          decimals?: number | null
+          deployed_at?: string | null
+          deployment_fee: number
+          deployment_status?: string | null
+          deployment_tx_hash?: string | null
+          factory_address: string
+          feature_bonus?: number | null
+          features?: Json | null
+          gas_fee?: number | null
+          id?: string
+          initiated_at?: string | null
+          innovation_score?: number | null
+          innovative_features?: string[] | null
+          is_first_token_today?: boolean | null
+          optimization_features?: Json | null
+          point_calculation_details?: Json | null
+          points_awarded?: number | null
+          points_calculated?: boolean | null
+          token_address?: string | null
+          token_description?: string | null
+          token_name: string
+          token_symbol: string
+          token_type: string
+          total_cost?: number | null
+          total_supply: number
+          type_bonus?: number | null
+          verification_fee?: number | null
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          advanced_features?: Json | null
+          base_points?: number | null
+          bonding_curve_type?: string | null
+          chain_bonus?: number | null
+          chain_id?: number
+          chain_name?: string
+          complexity_bonus?: number | null
+          creator_address?: string
+          creator_token_count?: number | null
+          curve_parameters?: Json | null
+          daily_tasks_completed?: string[] | null
+          decimals?: number | null
+          deployed_at?: string | null
+          deployment_fee?: number
+          deployment_status?: string | null
+          deployment_tx_hash?: string | null
+          factory_address?: string
+          feature_bonus?: number | null
+          features?: Json | null
+          gas_fee?: number | null
+          id?: string
+          initiated_at?: string | null
+          innovation_score?: number | null
+          innovative_features?: string[] | null
+          is_first_token_today?: boolean | null
+          optimization_features?: Json | null
+          point_calculation_details?: Json | null
+          points_awarded?: number | null
+          points_calculated?: boolean | null
+          token_address?: string | null
+          token_description?: string | null
+          token_name?: string
+          token_symbol?: string
+          token_type?: string
+          total_cost?: number | null
+          total_supply?: number
+          type_bonus?: number | null
+          verification_fee?: number | null
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       trader_profiles: {
         Row: {
           average_return: number | null
@@ -1531,6 +1836,210 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_creation_achievement_unlocks: {
+        Row: {
+          achievement_id: string
+          achievement_progress: number
+          creator_address: string
+          id: string
+          points_awarded: number
+          trigger_token_address: string | null
+          trigger_tx_hash: string | null
+          unlocked_at: string | null
+        }
+        Insert: {
+          achievement_id: string
+          achievement_progress: number
+          creator_address: string
+          id?: string
+          points_awarded: number
+          trigger_token_address?: string | null
+          trigger_tx_hash?: string | null
+          unlocked_at?: string | null
+        }
+        Update: {
+          achievement_id?: string
+          achievement_progress?: number
+          creator_address?: string
+          id?: string
+          points_awarded?: number
+          trigger_token_address?: string | null
+          trigger_tx_hash?: string | null
+          unlocked_at?: string | null
+        }
+        Relationships: []
+      }
+      user_creator_stats: {
+        Row: {
+          achievement_points: number | null
+          average_innovation_score: number | null
+          bonding_curve_tokens: number | null
+          creator_achievements: string[] | null
+          creator_address: string
+          creator_badges: string[] | null
+          creator_experience: number | null
+          creator_level: number | null
+          current_creation_streak: number | null
+          deflationary_tokens: number | null
+          failed_deployments: number | null
+          first_creation_at: string | null
+          governance_tokens: number | null
+          hft_tokens: number | null
+          id: string
+          innovation_points: number | null
+          last_activity_at: string | null
+          last_creation_date: string | null
+          longest_creation_streak: number | null
+          megaeth_tokens: number | null
+          memecoins: number | null
+          most_used_features: string[] | null
+          pharos_tokens: number | null
+          preferred_chain: string | null
+          reflection_tokens: number | null
+          risechain_tokens: number | null
+          rwa_tokens: number | null
+          standard_tokens: number | null
+          streaming_tokens: number | null
+          successful_deployments: number | null
+          token_creation_points: number | null
+          tokens_created_today: number | null
+          total_creation_points: number | null
+          total_deployment_cost_usd: number | null
+          total_tokens_created: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          achievement_points?: number | null
+          average_innovation_score?: number | null
+          bonding_curve_tokens?: number | null
+          creator_achievements?: string[] | null
+          creator_address: string
+          creator_badges?: string[] | null
+          creator_experience?: number | null
+          creator_level?: number | null
+          current_creation_streak?: number | null
+          deflationary_tokens?: number | null
+          failed_deployments?: number | null
+          first_creation_at?: string | null
+          governance_tokens?: number | null
+          hft_tokens?: number | null
+          id?: string
+          innovation_points?: number | null
+          last_activity_at?: string | null
+          last_creation_date?: string | null
+          longest_creation_streak?: number | null
+          megaeth_tokens?: number | null
+          memecoins?: number | null
+          most_used_features?: string[] | null
+          pharos_tokens?: number | null
+          preferred_chain?: string | null
+          reflection_tokens?: number | null
+          risechain_tokens?: number | null
+          rwa_tokens?: number | null
+          standard_tokens?: number | null
+          streaming_tokens?: number | null
+          successful_deployments?: number | null
+          token_creation_points?: number | null
+          tokens_created_today?: number | null
+          total_creation_points?: number | null
+          total_deployment_cost_usd?: number | null
+          total_tokens_created?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          achievement_points?: number | null
+          average_innovation_score?: number | null
+          bonding_curve_tokens?: number | null
+          creator_achievements?: string[] | null
+          creator_address?: string
+          creator_badges?: string[] | null
+          creator_experience?: number | null
+          creator_level?: number | null
+          current_creation_streak?: number | null
+          deflationary_tokens?: number | null
+          failed_deployments?: number | null
+          first_creation_at?: string | null
+          governance_tokens?: number | null
+          hft_tokens?: number | null
+          id?: string
+          innovation_points?: number | null
+          last_activity_at?: string | null
+          last_creation_date?: string | null
+          longest_creation_streak?: number | null
+          megaeth_tokens?: number | null
+          memecoins?: number | null
+          most_used_features?: string[] | null
+          pharos_tokens?: number | null
+          preferred_chain?: string | null
+          reflection_tokens?: number | null
+          risechain_tokens?: number | null
+          rwa_tokens?: number | null
+          standard_tokens?: number | null
+          streaming_tokens?: number | null
+          successful_deployments?: number | null
+          token_creation_points?: number | null
+          tokens_created_today?: number | null
+          total_creation_points?: number | null
+          total_deployment_cost_usd?: number | null
+          total_tokens_created?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_daily_creation_task_completions: {
+        Row: {
+          chains_used: string[] | null
+          completed_at: string | null
+          completion_tx_hash: string | null
+          creator_address: string
+          current_progress: number | null
+          features_used: string[] | null
+          id: string
+          innovation_scores: number[] | null
+          is_completed: boolean | null
+          points_awarded: number
+          required_progress: number
+          task_date: string
+          task_id: string
+          token_types_created: string[] | null
+          tokens_created_for_task: number | null
+        }
+        Insert: {
+          chains_used?: string[] | null
+          completed_at?: string | null
+          completion_tx_hash?: string | null
+          creator_address: string
+          current_progress?: number | null
+          features_used?: string[] | null
+          id?: string
+          innovation_scores?: number[] | null
+          is_completed?: boolean | null
+          points_awarded: number
+          required_progress: number
+          task_date: string
+          task_id: string
+          token_types_created?: string[] | null
+          tokens_created_for_task?: number | null
+        }
+        Update: {
+          chains_used?: string[] | null
+          completed_at?: string | null
+          completion_tx_hash?: string | null
+          creator_address?: string
+          current_progress?: number | null
+          features_used?: string[] | null
+          id?: string
+          innovation_scores?: number[] | null
+          is_completed?: boolean | null
+          points_awarded?: number
+          required_progress?: number
+          task_date?: string
+          task_id?: string
+          token_types_created?: string[] | null
+          tokens_created_for_task?: number | null
+        }
+        Relationships: []
       }
       user_points: {
         Row: {

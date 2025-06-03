@@ -14,6 +14,7 @@ import chainRoutes from './routes/chainRoutes';
 import bridgeRoutes from './routes/bridgeRoutes';
 import swapRoutes from './routes/swapRoutes';
 import enterpriseRoutes from './routes/enterpriseRoutes';
+import tokenCreationRoutes from './routes/tokenCreationRoutes';
 
 const app = express();
 
@@ -76,6 +77,7 @@ app.use('/api/v1/chains', chainRoutes);
 app.use('/api/v1/bridge', bridgeRoutes);
 app.use('/api/v1/swap', swapRoutes);
 app.use('/api/v1/enterprise', enterpriseRoutes);
+app.use('/api/v1/tokens', tokenCreationRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -110,9 +112,9 @@ async function startServer() {
     await databaseService.initialize();
     
     app.listen(PORT, () => {
-      logger.info(`SCRYPTEX Backend Phase 4 server running on port ${PORT}`);
+      logger.info(`SCRYPTEX Backend Phase 5 server running on port ${PORT}`);
       logger.info(`Environment: ${config.node.env}`);
-      logger.info('Multi-Chain DEX Swap Platform with Point Rewards - Ready');
+      logger.info('Multi-Chain Token Creation Platform with Point Rewards - Ready');
     });
   } catch (error) {
     logger.error('Failed to start server', {
