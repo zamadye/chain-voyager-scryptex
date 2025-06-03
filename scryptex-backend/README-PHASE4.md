@@ -1,208 +1,239 @@
 
-# SCRYPTEX Backend - Phase 4: Social Trading Platform
+# SCRYPTEX Backend - Phase 4: Multi-Chain DEX Swap Integration
 
 ## Overview
-Phase 4 transforms SCRYPTEX into a comprehensive social trading ecosystem with referral systems, gamification, copy trading, and community features built on top of the advanced trading infrastructure from Phase 3.
 
-## 🌟 Key Features
+Phase 4 implements a comprehensive multi-chain DEX swap platform with real SDK integrations for Clober DEX (RiseChain), GTE DEX (MegaETH), and Pharos DEX. The system includes automatic point rewards, daily tasks, achievements, and advanced trading analytics.
 
-### 🔗 Referral System
-- **Multi-tier referral tracking** with automatic code generation
-- **Reward distribution** based on referral performance
-- **Lifetime volume tracking** for referred users
-- **Tier-based commission structures**
+## 🎯 Core Features
 
-### 🎮 Gamification & Points
-- **Comprehensive point system** with multiple earning sources
-- **Daily tasks** with automatic reset and progression tracking
-- **Achievement system** with badges and milestones
-- **User ranking** and tier progression
-- **Streak tracking** for consistent activity
+### DEX Integrations
+- **Clober DEX (RiseChain)**: Central Limit Order Book (CLOB) protocol with market and limit orders
+- **GTE DEX (MegaETH)**: Real-time swap execution with sub-millisecond processing
+- **Pharos DEX**: Parallel processing with RWA token support
 
-### 👥 Social Features
-- **Social feed** with post creation and interactions
-- **Like, comment, and share** functionality
-- **Trade result sharing** with automatic post generation
-- **User profiles** with social scoring
-- **Activity streams** and engagement metrics
+### Point System
+- **5 points per successful swap** (base reward)
+- **DEX-specific bonuses**: Clober (+1), GTE (+2), Pharos (+2)
+- **Volume bonuses**: Up to +10 points for large trades
+- **Frequency bonuses**: Daily streak rewards
+- **Special bonuses**: Real-time swaps, RWA tokens, HFT trading
 
-### 📊 Copy Trading
-- **Follow successful traders** with customizable settings
-- **Automatic trade copying** with risk management
-- **Performance tracking** for copy traders and followers
-- **Trader verification** system
-- **Portfolio allocation** controls
+### Daily Tasks
+- First swap of the day (+5 points)
+- Complete multiple swaps (+15 points)
+- Trade on different DEXs (+20 points)
+- Volume-based challenges (+10 points)
 
-### 🏆 Competitions
-- **Trading competitions** with various formats
-- **Real-time leaderboards** and ranking
-- **Prize pool distribution** 
-- **Entry fee management**
-- **Competition rules** and scoring systems
+### Trading Features
+- Optimal route selection across DEXs
+- Real-time price aggregation
+- Slippage protection
+- MEV resistance
+- Trading analytics and performance metrics
 
-### 🗳️ Community Governance
-- **Proposal creation** and voting system
-- **Voting power** calculation based on multiple factors
-- **Proposal lifecycle** management
-- **Implementation tracking**
-- **Community decision making**
-
-### 📈 Social Analytics
-- **Influence scoring** for traders
-- **Engagement metrics** and trends
-- **Social leaderboards** across multiple categories
-- **Performance analytics** for social activities
-
-## 🛠️ Technical Implementation
+## 🏗️ Architecture
 
 ### Database Schema
-```sql
--- Core social tables created:
-- users (enhanced with social features)
-- referrals (referral tracking)
-- user_points (gamification system)
-- user_activities (activity tracking)
-- daily_tasks (task management)
-- social_posts (content system)
-- post_interactions (engagement)
-- copy_trading_follows (copy trading)
-- trader_profiles (trader info)
-- competitions (competition system)
-- competition_participants (participation)
-- achievements (badge system)
-- user_achievements (user progress)
-- governance_proposals (voting system)
-- governance_votes (vote tracking)
-- notifications (notification system)
+- `swap_transactions`: Core swap execution records
+- `user_trading_stats`: User points and trading statistics
+- `daily_trading_tasks`: Daily challenge definitions
+- `user_daily_trading_task_completions`: Task progress tracking
+- `trading_achievements`: Achievement definitions
+- `user_trading_achievement_unlocks`: User achievement records
+
+### Service Layer
+- `SwapService`: Core swap execution and point calculation
+- `SwapController`: HTTP API endpoint handlers
+- Database services for persistence
+- Redis for caching and real-time updates
+
+## 🔧 API Endpoints
+
+### Swap Operations
+```
+GET  /api/v1/swap/quote                 - Get swap quotes
+POST /api/v1/swap/execute               - Execute swap
+GET  /api/v1/swap/status/:txHash        - Get swap status
+GET  /api/v1/swap/history/:address      - Get swap history
+GET  /api/v1/swap/routes/optimal        - Find optimal route
 ```
 
-### API Endpoints
+### DEX-Specific
+```
+GET /api/v1/swap/dex/clober/orderbook/:pair    - Clober order book
+GET /api/v1/swap/dex/gte/realtime-price/:pair  - GTE real-time prices
+GET /api/v1/swap/dex/pharos/rwa-tokens         - Pharos RWA tokens
+```
 
-#### Referral System
-- `POST /api/social/referrals/generate` - Generate referral code
-- `GET /api/social/referrals/stats` - Get referral statistics
-- `POST /api/social/referrals/claim-reward` - Claim referral rewards
+### Points & Analytics
+```
+GET /api/v1/swap/trading/points/:address           - User trading points
+GET /api/v1/swap/trading/leaderboard               - Trading leaderboard
+GET /api/v1/swap/trading/achievements/:address     - User achievements
+GET /api/v1/swap/trading/tasks/daily               - Daily tasks
+GET /api/v1/swap/trading/tasks/:address/progress   - Task progress
+GET /api/v1/swap/trading/analytics/:address        - Trading analytics
+```
 
-#### Points & Gamification
-- `GET /api/social/points/balance` - Get point balance
-- `GET /api/social/points/history` - Get point transaction history
-- `POST /api/social/points/redeem` - Redeem points for rewards
+## 🌍 Environment Variables
 
-#### Social Features
-- `POST /api/social/posts` - Create social post
-- `GET /api/social/feed` - Get personalized feed
-- `POST /api/social/posts/:id/like` - Like a post
-- `POST /api/social/posts/:id/comment` - Comment on post
+### Required Configuration
+```env
+# Clober DEX (RiseChain)
+CLOBER_RPC_URL=https://risechain-testnet-rpc.com
+CLOBER_BOOK_MANAGER_ADDRESS=0x...
+CLOBER_ROUTER_ADDRESS=0x...
+CLOBER_QUOTER_ADDRESS=0x...
+CLOBER_PRIVATE_KEY=your-key
 
-#### Copy Trading
-- `POST /api/social/copy-trading/follow` - Follow a trader
-- `DELETE /api/social/copy-trading/follow/:id` - Unfollow trader
-- `GET /api/social/copy-trading/followers` - Get followers
-- `GET /api/social/copy-trading/performance` - Get performance
+# GTE DEX (MegaETH)
+GTE_RPC_URL=https://megaeth-testnet-rpc.com
+GTE_ROUTER_ADDRESS=0x...
+GTE_FACTORY_ADDRESS=0x...
+GTE_REALTIME_PROCESSOR=0x...
+GTE_PRIVATE_KEY=your-key
 
-#### Competitions
-- `GET /api/social/competitions` - Get available competitions
-- `POST /api/social/competitions/:id/join` - Join competition
-- `GET /api/social/competitions/:id/leaderboard` - Get leaderboard
+# Pharos DEX
+PHAROS_DEX_RPC_URL=https://pharos-testnet-rpc.com
+PHAROS_DEX_ROUTER_ADDRESS=0x...
+PHAROS_DEX_FACTORY_ADDRESS=0x...
+PHAROS_RWA_COMPLIANCE_ADDRESS=0x...
+PHAROS_DEX_PRIVATE_KEY=your-key
 
-#### Governance
-- `GET /api/social/governance/proposals` - Get active proposals
-- `POST /api/social/governance/proposals` - Create proposal
-- `POST /api/social/governance/vote` - Vote on proposal
+# External Services
+PRICE_FEED_API_KEY=your-price-feed-key
+DEX_AGGREGATOR_API_KEY=your-aggregator-key
+TRADING_WEBHOOK_URL=your-webhook-url
+```
 
-#### Leaderboards
-- `GET /api/social/leaderboard` - Get community leaderboard
+## 🚀 Getting Started
 
-### Services
+### 1. Database Setup
+```bash
+# Run the Phase 4 migration
+psql -d scryptex_dev -f database/migrations/004_swap_point_system.sql
+```
 
-#### SocialService
-Core service handling all social trading functionality:
-- User management and profiles
-- Referral system operations
-- Points and achievement tracking
-- Social content management
-- Copy trading operations
-- Competition management
-- Governance operations
+### 2. Environment Configuration
+```bash
+cp .env.example .env
+# Edit .env with your actual configuration values
+```
 
-### Authentication & Security
-- **JWT-based authentication** for all social features
-- **Input validation** and sanitization
-- **Rate limiting** for social interactions
-- **Privacy controls** for user data
-- **Secure voting** mechanisms
+### 3. Install Dependencies
+```bash
+npm install
+```
 
-## 🚀 Integration with Previous Phases
+### 4. Start Development Server
+```bash
+npm run dev
+```
 
-### Phase 1-2 Integration
-- **Enhanced user profiles** with social metrics
-- **Wallet-based authentication** extended for social features
-- **Multi-chain support** for social activities
+## 📊 Point System Details
 
-### Phase 3 Integration
-- **Trade result sharing** from trading executions
-- **Copy trading** integration with trading engine
-- **Competition tracking** linked to trading performance
-- **Points awarded** for trading activities
+### Base Points Structure
+- **Swap Completion**: 5 points
+- **DEX Bonuses**: 1-2 additional points
+- **Volume Bonuses**: 0-10 additional points
+- **Special Actions**: 2-8 additional points
 
-## 📊 Key Metrics & Analytics
+### Daily Tasks
+- **Completion Tracking**: Automatic progress updates
+- **Reward Distribution**: Immediate point awards
+- **Streak Bonuses**: Consecutive day multipliers
 
-### User Engagement
-- Social score calculation
-- Activity streaks and consistency
-- Post engagement rates
-- Community participation
+### Achievements
+- **Milestone-based**: First swap, volume targets
+- **Performance-based**: Trading streaks, efficiency
+- **Exploration-based**: Multi-DEX usage, RWA trading
 
-### Trading Social Metrics
-- Copy trading success rates
-- Trader influence scores
-- Competition performance
-- Referral trading volumes
+## 🔒 Security
 
-### Community Health
-- Proposal participation rates
-- Voting engagement
-- Content quality metrics
-- User retention and growth
+### Private Key Management
+- Environment variable storage
+- Encryption at rest
+- Secure transaction signing
 
-## 🎯 Business Impact
+### Transaction Validation
+- Multi-layer verification
+- Slippage protection
+- MEV resistance mechanisms
 
-### User Acquisition
-- **Referral system** drives organic growth
-- **Gamification** increases user engagement
-- **Social features** improve retention
-- **Copy trading** attracts new traders
+### Rate Limiting
+- API endpoint protection
+- User-specific limits
+- DDoS prevention
 
-### Revenue Opportunities
-- **Competition entry fees**
-- **Premium social features**
-- **Enhanced copy trading tools**
-- **Governance token utilities**
+## 📈 Performance
 
-### Community Building
-- **Social interaction** builds loyalty
-- **Trader verification** builds trust
-- **Governance participation** ensures sustainability
-- **Achievement systems** motivate continued use
+### Response Times
+- Swap quotes: < 2 seconds
+- Swap execution: < 5 seconds
+- Point calculation: < 1 second
+- Database queries: < 300ms
 
-## 🔄 Next Steps (Phase 5 Potential)
+### Scalability
+- Horizontal scaling support
+- Redis caching layer
+- Database optimization
+- Background job processing
 
-### Advanced AI Features
-- **AI-powered trading signals**
-- **Sentiment analysis** of social posts
-- **Automated competition strategies**
-- **Predictive analytics** for social trends
+## 🧪 Testing
 
-### Mobile App Enhancement
-- **Push notifications** for social activities
-- **Mobile-first social features**
-- **Offline competition tracking**
-- **Enhanced mobile copy trading**
+### Unit Tests
+```bash
+npm run test
+```
 
-### Institutional Features
-- **White-label social trading**
-- **Enterprise governance tools**
-- **Advanced analytics dashboards**
-- **Institutional copy trading**
+### Integration Tests
+```bash
+npm run test:integration
+```
 
-This Phase 4 implementation creates a comprehensive social trading ecosystem that combines the technical capabilities from previous phases with engaging social features, community governance, and gamified experiences.
+### API Testing
+```bash
+npm run test:api
+```
+
+## 📝 Development Notes
+
+### Adding New DEXs
+1. Extend DEXName enum in types
+2. Implement SDK integration in SwapService
+3. Add route handlers in SwapController
+4. Update point calculation logic
+5. Add database migrations if needed
+
+### Point System Modifications
+1. Update point configuration in SwapService
+2. Modify calculation logic
+3. Add new achievement types
+4. Update daily task definitions
+
+## 🐛 Troubleshooting
+
+### Common Issues
+- **SDK Connection Failures**: Check RPC endpoints
+- **Transaction Failures**: Verify gas limits and slippage
+- **Point Calculation Errors**: Check user statistics consistency
+- **Cache Issues**: Clear Redis cache
+
+### Logging
+- All operations are logged with correlation IDs
+- Error tracking with stack traces
+- Performance monitoring included
+
+## 🔄 Phase 4 Completion
+
+Phase 4 establishes the foundation for multi-chain DEX trading with:
+- ✅ Real SDK integrations for 3 major DEXs
+- ✅ Comprehensive point system with daily tasks
+- ✅ Trading analytics and leaderboards
+- ✅ Optimal route selection algorithms
+- ✅ Complete API documentation
+- ✅ Database schema and migrations
+- ✅ Security and performance optimizations
+
+**Ready for Phase 5**: Advanced features, governance, and ecosystem expansion.

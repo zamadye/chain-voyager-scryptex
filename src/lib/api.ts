@@ -6,7 +6,9 @@ export const mockApi = {
     await new Promise(resolve => setTimeout(resolve, 100));
     
     try {
-      // Mock different responses based on endpoint for bridge service
+      // Mock different responses based on endpoint
+      
+      // Bridge service endpoints
       if (endpoint.includes('/bridge/quote')) {
         const mockQuoteResponse = {
           selectedRoute: {
@@ -27,15 +29,6 @@ export const mockApi = {
               estimatedTime: 45,
               securityScore: 92,
               pointsReward: 15
-            },
-            {
-              provider: 'megaeth' as const,
-              sourceChain: 1,
-              targetChain: 6342,
-              estimatedFee: '800000000000000', // 0.0008 ETH in wei
-              estimatedTime: 15,
-              securityScore: 88,
-              pointsReward: 13
             }
           ],
           strategy: options?.params?.strategy || 'fastest',
@@ -92,85 +85,101 @@ export const mockApi = {
         };
       }
 
-      if (endpoint.includes('/bridge/points')) {
-        const mockPoints = {
-          userAddress: '0x1234567890123456789012345678901234567890',
-          totalPoints: 1250,
-          bridgePoints: 1000,
-          bonusPoints: 200,
-          dailyTaskPoints: 50,
-          totalBridges: 85,
-          successfulBridges: 82,
-          totalBridgeVolume: '15500000000000000000',
-          risechainBridges: 35,
-          pharosBridges: 25,
-          megaethBridges: 22,
-          currentDailyStreak: 5,
-          longestDailyStreak: 12,
-          bridgesToday: 2,
-          achievements: ['first_bridge', 'speed_demon', 'multi_chain_master'],
-          rank: 47
-        };
-
-        return {
-          success: true,
-          data: mockPoints as T,
-          error: '',
-          message: 'Success'
-        };
-      }
-
-      if (endpoint.includes('/bridge/leaderboard')) {
-        const mockLeaderboard = {
-          leaderboard: [
+      // Swap service endpoints
+      if (endpoint.includes('/swap/quote')) {
+        const mockSwapQuote = {
+          dex: options?.params?.dex || 'clober',
+          tokenIn: options?.params?.tokenIn || '0x0000000000000000000000000000000000000000',
+          tokenOut: options?.params?.tokenOut || '0x1234567890123456789012345678901234567890',
+          amountIn: options?.params?.amountIn || '1000000000000000000',
+          amountOut: '2450000000', // USDC amount
+          priceImpact: 0.05,
+          tradingFee: '2500000000000000', // 0.0025 ETH
+          platformFee: '500000000000000', // 0.0005 ETH
+          gasEstimate: 150000,
+          route: [
             {
-              rank: 1,
-              userAddress: '0x1111111111111111111111111111111111111111',
-              totalPoints: 5420,
-              totalBridges: 342,
-              totalVolume: '85000000000000000000',
-              achievements: ['legendary_bridger', 'volume_king', 'speed_demon']
-            },
-            {
-              rank: 2,
-              userAddress: '0x2222222222222222222222222222222222222222',
-              totalPoints: 4850,
-              totalBridges: 298,
-              totalVolume: '72000000000000000000',
-              achievements: ['multi_chain_master', 'consistency_champion']
+              dex: 'clober',
+              pair: 'ETH/USDC',
+              amountIn: options?.params?.amountIn || '1000000000000000000',
+              amountOut: '2450000000',
+              fee: 0.25
             }
           ],
-          period: 'all_time',
-          lastUpdated: new Date().toISOString()
+          validUntil: Date.now() + 30000
         };
 
         return {
           success: true,
-          data: mockLeaderboard as T,
+          data: mockSwapQuote as T,
           error: '',
           message: 'Success'
         };
       }
 
-      if (endpoint.includes('/bridge/tasks/daily')) {
+      if (endpoint.includes('/swap/trading/points')) {
+        const mockTradingStats = {
+          userAddress: '0x1234567890123456789012345678901234567890',
+          totalTradingPoints: 850,
+          swapPoints: 600,
+          bonusPoints: 200,
+          achievementPoints: 50,
+          totalSwaps: 120,
+          successfulSwaps: 118,
+          totalTradingVolumeUsd: '25000000000000000000', // $25k
+          cloberSwaps: 45,
+          gteSwaps: 35,
+          pharosDexSwaps: 38,
+          averagePriceImpact: 0.12,
+          averageSlippage: 0.08,
+          currentTradingStreak: 7,
+          longestTradingStreak: 15,
+          swapsToday: 3,
+          tradingLevel: 5,
+          tradingExperience: 850,
+          achievements: ['first_swap', 'volume_100', 'multi_dex'],
+          lastActivityAt: new Date().toISOString()
+        };
+
+        return {
+          success: true,
+          data: mockTradingStats as T,
+          error: '',
+          message: 'Success'
+        };
+      }
+
+      if (endpoint.includes('/swap/trading/tasks/daily')) {
         const mockTasks = {
           tasks: [
             {
-              taskId: 'daily_bridge_1',
-              taskName: 'First Bridge of the Day',
-              taskDescription: 'Complete your first bridge transaction today',
-              taskType: 'bridge_count',
-              requiredProgress: 1,
+              taskId: 'daily_swap_1',
+              taskName: 'First Swap of the Day',
+              taskDescription: 'Complete your first swap today',
+              taskType: 'swap_count',
+              requiredSwaps: 1,
               taskPoints: 5,
+              bonusMultiplier: 1.0,
               isActive: true
             },
             {
-              taskId: 'daily_bridge_3',
-              taskName: 'Bridge Explorer',
-              taskDescription: 'Bridge to 3 different chains today',
-              taskType: 'bridge_chains',
-              requiredProgress: 3,
+              taskId: 'daily_swap_3',
+              taskName: 'Active Trader',
+              taskDescription: 'Complete 3 swaps today',
+              taskType: 'swap_count',
+              requiredSwaps: 3,
               taskPoints: 15,
+              bonusMultiplier: 1.0,
+              isActive: true
+            },
+            {
+              taskId: 'daily_dex_variety',
+              taskName: 'DEX Explorer',
+              taskDescription: 'Trade on 2 different DEXs today',
+              taskType: 'dex_variety',
+              requiredDexs: 2,
+              taskPoints: 20,
+              bonusMultiplier: 1.0,
               isActive: true
             }
           ],
@@ -180,6 +189,71 @@ export const mockApi = {
         return {
           success: true,
           data: mockTasks as T,
+          error: '',
+          message: 'Success'
+        };
+      }
+
+      if (endpoint.includes('/swap/history')) {
+        const mockSwapHistory = {
+          swaps: [
+            {
+              id: 'swap_001',
+              userAddress: '0x1234567890123456789012345678901234567890',
+              chainId: 6342,
+              dexName: 'clober',
+              tokenInSymbol: 'RISE',
+              tokenOutSymbol: 'USDC',
+              amountIn: '1000000000000000000',
+              amountOut: '2450000000',
+              swapType: 'standard',
+              priceImpact: 0.05,
+              tradingFee: '2500000000000000',
+              swapStatus: 'completed',
+              executedAt: new Date(Date.now() - 1800000).toISOString(),
+              pointsAwarded: 7,
+              txHash: '0xabc123def456'
+            }
+          ],
+          pagination: {
+            limit: 50,
+            offset: 0,
+            total: 1
+          }
+        };
+
+        return {
+          success: true,
+          data: mockSwapHistory as T,
+          error: '',
+          message: 'Success'
+        };
+      }
+
+      if (endpoint.includes('/swap/routes/optimal')) {
+        const mockOptimalRoute = {
+          recommendedDEX: 'clober',
+          recommendedChain: 6342,
+          estimatedAmountOut: '2450000000',
+          estimatedFee: '3000000000000000',
+          estimatedGas: 150000,
+          pointsToAward: 7,
+          priceImpact: 0.05,
+          reasonForRecommendation: 'Best price output with optimal gas efficiency',
+          alternativeRoutes: [
+            {
+              dex: 'gte',
+              amountOut: '2445000000',
+              tradingFee: '2000000000000000',
+              platformFee: '400000000000000',
+              gasEstimate: 120000
+            }
+          ]
+        };
+
+        return {
+          success: true,
+          data: mockOptimalRoute as T,
           error: '',
           message: 'Success'
         };
@@ -229,6 +303,25 @@ export const mockApi = {
           data: mockBridgeResponse as T,
           error: '',
           message: 'Bridge initiated successfully'
+        };
+      }
+
+      if (endpoint.includes('/swap/execute')) {
+        const mockSwapResponse = {
+          success: true,
+          txHash: `0x${Math.random().toString(16).slice(2)}`,
+          amountOut: '2445123456',
+          actualPriceImpact: 0.07,
+          actualSlippage: 0.05,
+          gasUsed: 148523,
+          tradingFee: '2500000000000000'
+        };
+
+        return {
+          success: true,
+          data: mockSwapResponse as T,
+          error: '',
+          message: 'Swap executed successfully'
         };
       }
 

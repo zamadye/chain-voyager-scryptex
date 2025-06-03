@@ -1,10 +1,10 @@
-
 import { authService } from './authService';
 import { chainService } from './chainService';
 import { tradingService } from './tradingService';
 import { socialService } from './socialService';
 import { enterpriseService } from './enterpriseService';
 import { bridgeService } from './bridgeService';
+import { swapService } from './swapService';
 
 // Export individual services
 export { authService } from './authService';
@@ -13,6 +13,7 @@ export { tradingService } from './tradingService';
 export { socialService } from './socialService';
 export { enterpriseService } from './enterpriseService';
 export { bridgeService } from './bridgeService';
+export { swapService } from './swapService';
 
 // Export types
 export type { AuthCredentials, User, AuthResponse } from './authService';
@@ -32,6 +33,20 @@ export type {
   BridgeAnalytics,
   BridgeQuoteResponse
 } from './bridgeService';
+export type {
+  SwapQuoteRequest,
+  SwapQuote as SwapQuoteType,
+  SwapExecuteRequest,
+  SwapResult,
+  OptimalRouteRequest,
+  OptimalRouteResponse,
+  UserTradingStats,
+  DailyTradingTask,
+  UserTaskProgress as SwapTaskProgress,
+  TradingAnalytics,
+  OrderBook,
+  MarketData
+} from './swapService';
 
 // Unified API client
 export class APIClient {
@@ -41,6 +56,7 @@ export class APIClient {
   social = socialService;
   enterprise = enterpriseService;
   bridge = bridgeService;
+  swap = swapService;
 }
 
 export const api = new APIClient();

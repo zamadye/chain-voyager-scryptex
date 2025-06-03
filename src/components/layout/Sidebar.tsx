@@ -1,195 +1,126 @@
-import { NavLink } from 'react-router-dom';
+
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import {
-  Home, Shuffle, Repeat, BarChart3, History, User, Settings,
-  Gift, UserPlus, Coins, Sun, FileText, HelpCircle, Building2,
-  Layers, Wrench, Zap, ArrowLeftRight
+import { 
+  Home,
+  TrendingUp,
+  Bridge,
+  ArrowUpDown,
+  Trophy,
+  Building2,
+  Users,
+  MessageSquare,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 
 const Sidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
+
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
-    { name: 'Chains', href: '/chains', icon: Layers },
-    { name: 'Create', href: '/create', icon: Wrench },
-    { name: 'Deploy', href: '/deploy', icon: Zap },
-    { name: 'Swap', href: '/swap', icon: Repeat },
-    { name: 'Bridge', href: '/bridge', icon: ArrowLeftRight, badge: 'NEW', description: 'Cross-chain asset bridging with point rewards' },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'History', href: '/history', icon: History },
-  ];
-
-  const enterpriseNav = [
+    { name: 'Trading', href: '/trading', icon: TrendingUp },
+    { name: 'Bridge', href: '/bridge', icon: Bridge },
+    { name: 'Swap', href: '/swap', icon: ArrowUpDown },
+    { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
     { name: 'Enterprise', href: '/enterprise', icon: Building2 },
+    { name: 'Social', href: '/social', icon: Users },
+    { name: 'Governance', href: '/governance', icon: MessageSquare },
   ];
 
-  const socialNav = [
-    { name: 'Points', href: '/points', icon: Gift },
-    { name: 'Referrals', href: '/referrals', icon: UserPlus },
-    { name: 'Earn STEX', href: '/earn-stex', icon: Coins },
-    { name: 'GM Protocol', href: '/gm', icon: Sun },
-  ];
-
-  const accountNav = [
-    { name: 'Profile', href: '/profile', icon: User },
+  const bottomNavigation = [
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const supportNav = [
-    { name: 'Documentation', href: '/docs', icon: FileText },
-    { name: 'Support', href: '/support', icon: HelpCircle },
-  ];
-
   return (
-    <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-900/95 backdrop-blur-sm border-r border-slate-800 px-6 pb-4">
-        <div className="flex h-16 shrink-0 items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">S</span>
+    <div className={cn(
+      "bg-slate-900/95 backdrop-blur-sm border-r border-slate-800 flex flex-col transition-all duration-300",
+      isCollapsed ? "w-16" : "w-64"
+    )}>
+      {/* Header */}
+      <div className="p-4 border-b border-slate-800">
+        <div className="flex items-center justify-between">
+          {!isCollapsed && (
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-white">SCRYPTEX</span>
             </div>
-            <span className="text-white font-bold text-xl">SCRYPTEX</span>
+          )}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+          >
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2">
+        {navigation.map((item) => {
+          const isActive = location.pathname === item.href;
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={cn(
+                "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/50",
+                isCollapsed && "justify-center"
+              )}
+            >
+              <item.icon className={cn("h-5 w-5", isCollapsed ? "" : "mr-3")} />
+              {!isCollapsed && <span>{item.name}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Bottom Navigation */}
+      <div className="p-4 border-t border-slate-800 space-y-2">
+        {bottomNavigation.map((item) => {
+          const isActive = location.pathname === item.href;
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={cn(
+                "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-slate-800 text-white"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/50",
+                isCollapsed && "justify-center"
+              )}
+            >
+              <item.icon className={cn("h-5 w-5", isCollapsed ? "" : "mr-3")} />
+              {!isCollapsed && <span>{item.name}</span>}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* User Section */}
+      {!isCollapsed && (
+        <div className="p-4 border-t border-slate-800">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-bold">U</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-white text-sm font-medium">User</div>
+              <div className="text-slate-400 text-xs">Trader Level 5</div>
+            </div>
           </div>
         </div>
-        
-        <nav className="flex flex-1 flex-col">
-          <ul role="list" className="flex flex-1 flex-col gap-y-7">
-            {/* Main Navigation */}
-            <li>
-              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
-                Platform
-              </div>
-              <ul role="list" className="-mx-2 mt-2 space-y-1">
-                {navigation.map((item) => (
-                  <li key={item.name}>
-                    <NavLink
-                      to={item.href}
-                      className={({ isActive }) =>
-                        cn(
-                          isActive
-                            ? 'bg-slate-800 text-white'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
-                        )
-                      }
-                    >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      {item.name}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </li>
-
-            {/* Enterprise Navigation */}
-            <li>
-              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
-                Enterprise
-              </div>
-              <ul role="list" className="-mx-2 mt-2 space-y-1">
-                {enterpriseNav.map((item) => (
-                  <li key={item.name}>
-                    <NavLink
-                      to={item.href}
-                      className={({ isActive }) =>
-                        cn(
-                          isActive
-                            ? 'bg-slate-800 text-white'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
-                        )
-                      }
-                    >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      {item.name}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </li>
-
-            {/* Social & Rewards */}
-            <li>
-              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
-                Social & Rewards
-              </div>
-              <ul role="list" className="-mx-2 mt-2 space-y-1">
-                {socialNav.map((item) => (
-                  <li key={item.name}>
-                    <NavLink
-                      to={item.href}
-                      className={({ isActive }) =>
-                        cn(
-                          isActive
-                            ? 'bg-slate-800 text-white'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
-                        )
-                      }
-                    >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      {item.name}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </li>
-
-            {/* Account */}
-            <li>
-              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
-                Account
-              </div>
-              <ul role="list" className="-mx-2 mt-2 space-y-1">
-                {accountNav.map((item) => (
-                  <li key={item.name}>
-                    <NavLink
-                      to={item.href}
-                      className={({ isActive }) =>
-                        cn(
-                          isActive
-                            ? 'bg-slate-800 text-white'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
-                        )
-                      }
-                    >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      {item.name}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </li>
-
-            {/* Support */}
-            <li className="mt-auto">
-              <div className="text-xs font-semibold leading-6 text-slate-400 uppercase tracking-wide">
-                Support
-              </div>
-              <ul role="list" className="-mx-2 mt-2 space-y-1">
-                {supportNav.map((item) => (
-                  <li key={item.name}>
-                    <NavLink
-                      to={item.href}
-                      className={({ isActive }) =>
-                        cn(
-                          isActive
-                            ? 'bg-slate-800 text-white'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800',
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
-                        )
-                      }
-                    >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      {item.name}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          </ul>
-        </nav>
-      </div>
+      )}
     </div>
   );
 };
