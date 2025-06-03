@@ -153,7 +153,7 @@ const BridgePage = () => {
               
               <div className="space-y-6">
                 {/* Daily Tasks Preview */}
-                {dailyTasks && (
+                {dailyTasks && dailyTasks.tasks && (
                   <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
                     <CardHeader>
                       <CardTitle className="text-white flex items-center">
@@ -178,7 +178,7 @@ const BridgePage = () => {
                 )}
 
                 {/* Top Performers */}
-                {leaderboard && (
+                {leaderboard && leaderboard.leaderboard && (
                   <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm">
                     <CardHeader>
                       <CardTitle className="text-white flex items-center">
@@ -217,38 +217,44 @@ const BridgePage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {bridgeHistory?.bridges.map((bridge) => (
-                    <div key={bridge.id} className="bg-slate-800/50 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-white font-medium">
-                              {bridgeService.formatBridgeAmount(bridge.amount)} {bridge.tokenSymbol}
-                            </span>
-                            <Badge className={`${getStatusColor(bridge.bridgeStatus)}`}>
-                              {bridge.bridgeStatus}
-                            </Badge>
+                  {bridgeHistory?.bridges && bridgeHistory.bridges.length > 0 ? (
+                    bridgeHistory.bridges.map((bridge) => (
+                      <div key={bridge.id} className="bg-slate-800/50 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="text-white font-medium">
+                                {bridgeService.formatBridgeAmount(bridge.amount)} {bridge.tokenSymbol}
+                              </span>
+                              <Badge className={`${getStatusColor(bridge.bridgeStatus)}`}>
+                                {bridge.bridgeStatus}
+                              </Badge>
+                            </div>
+                            <p className="text-slate-400 text-sm">
+                              Chain {bridge.sourceChainId} → Chain {bridge.targetChainId}
+                            </p>
                           </div>
-                          <p className="text-slate-400 text-sm">
-                            Chain {bridge.sourceChainId} → Chain {bridge.targetChainId}
-                          </p>
+                          <div className="text-right">
+                            <p className="text-yellow-400 font-medium">+{bridge.pointsAwarded}pts</p>
+                            <p className="text-slate-400 text-xs">{formatTimeAgo(bridge.initiatedAt)}</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-yellow-400 font-medium">+{bridge.pointsAwarded}pts</p>
-                          <p className="text-slate-400 text-xs">{formatTimeAgo(bridge.initiatedAt)}</p>
+                        
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-400">
+                            via {bridgeService.getBridgeProviderName(bridge.bridgeProvider)}
+                          </span>
+                          <span className="text-slate-400">
+                            Fee: {bridgeService.formatBridgeFee(bridge.bridgeFee)}
+                          </span>
                         </div>
                       </div>
-                      
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-slate-400">
-                          via {bridgeService.getBridgeProviderName(bridge.bridgeProvider)}
-                        </span>
-                        <span className="text-slate-400">
-                          Fee: {bridgeService.formatBridgeFee(bridge.bridgeFee)}
-                        </span>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-slate-400">
+                      No bridge transactions found
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -261,21 +267,27 @@ const BridgePage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dailyTasks?.tasks.map((task) => (
-                    <div key={task.taskId} className="bg-slate-800/50 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-white font-medium">{task.taskName}</h3>
-                        <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/50">
-                          +{task.taskPoints} points
-                        </Badge>
+                  {dailyTasks?.tasks && dailyTasks.tasks.length > 0 ? (
+                    dailyTasks.tasks.map((task) => (
+                      <div key={task.taskId} className="bg-slate-800/50 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="text-white font-medium">{task.taskName}</h3>
+                          <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/50">
+                            +{task.taskPoints} points
+                          </Badge>
+                        </div>
+                        <p className="text-slate-400 text-sm mb-3">{task.taskDescription}</p>
+                        <div className="bg-slate-700/50 rounded-full h-2">
+                          <div className="bg-gradient-to-r from-orange-400 to-yellow-400 h-2 rounded-full w-0"></div>
+                        </div>
+                        <p className="text-slate-400 text-xs mt-1">0 / {task.requiredProgress} completed</p>
                       </div>
-                      <p className="text-slate-400 text-sm mb-3">{task.taskDescription}</p>
-                      <div className="bg-slate-700/50 rounded-full h-2">
-                        <div className="bg-gradient-to-r from-orange-400 to-yellow-400 h-2 rounded-full w-0"></div>
-                      </div>
-                      <p className="text-slate-400 text-xs mt-1">0 / {task.requiredProgress} completed</p>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-slate-400">
+                      No daily tasks available
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -288,30 +300,36 @@ const BridgePage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {leaderboard?.leaderboard.map((entry, index) => (
-                    <div key={entry.userAddress} className="flex justify-between items-center bg-slate-800/50 rounded-lg p-4">
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-black font-bold ${
-                          index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                          index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400' :
-                          index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-700' :
-                          'bg-slate-600 text-white'
-                        }`}>
-                          {index + 1}
+                  {leaderboard?.leaderboard && leaderboard.leaderboard.length > 0 ? (
+                    leaderboard.leaderboard.map((entry, index) => (
+                      <div key={entry.userAddress} className="flex justify-between items-center bg-slate-800/50 rounded-lg p-4">
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-black font-bold ${
+                            index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                            index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400' :
+                            index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-700' :
+                            'bg-slate-600 text-white'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">
+                              {entry.userAddress.slice(0, 6)}...{entry.userAddress.slice(-4)}
+                            </p>
+                            <p className="text-slate-400 text-sm">{entry.totalBridges} bridges</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-white font-medium">
-                            {entry.userAddress.slice(0, 6)}...{entry.userAddress.slice(-4)}
-                          </p>
-                          <p className="text-slate-400 text-sm">{entry.totalBridges} bridges</p>
+                        <div className="text-right">
+                          <p className="text-yellow-400 text-lg font-bold">{entry.totalPoints}</p>
+                          <p className="text-slate-400 text-sm">points</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-yellow-400 text-lg font-bold">{entry.totalPoints}</p>
-                        <p className="text-slate-400 text-sm">points</p>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-slate-400">
+                      No leaderboard data available
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
