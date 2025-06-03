@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
   Home,
   TrendingUp,
-  Bridge,
+  Link as LinkIcon,
   ArrowUpDown,
   Trophy,
   Building2,
@@ -24,7 +23,7 @@ const Sidebar = () => {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
     { name: 'Trading', href: '/trading', icon: TrendingUp },
-    { name: 'Bridge', href: '/bridge', icon: Bridge },
+    { name: 'Bridge', href: '/bridge', icon: LinkIcon },
     { name: 'Swap', href: '/swap', icon: ArrowUpDown },
     { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
     { name: 'Enterprise', href: '/enterprise', icon: Building2 },
